@@ -41,7 +41,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     "This is free software, and you are welcome to redistribute it" << endl <<
     "under certain conditions. See LICENSE.txt." << endl << endl;
 
-    cout << "Test... ";
+    cout << "Test... " << endl;
 
     cout << "Input sensor was set to: ";
 

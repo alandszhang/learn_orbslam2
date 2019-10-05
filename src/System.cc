@@ -25,6 +25,7 @@
 #include <thread>
 #include <pangolin/pangolin.h>
 #include <iomanip>
+#include <unistd.h> 
 
 namespace ORB_SLAM2
 {
@@ -42,11 +43,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     cout << "Input sensor was set to: ";
 
-    if(mSensor==MONOCULAR)
+    if(mSensor == MONOCULAR)
         cout << "Monocular" << endl;
-    else if(mSensor==STEREO)
+    else if(mSensor == STEREO)
         cout << "Stereo" << endl;
-    else if(mSensor==RGBD)
+    else if(mSensor == RGBD)
         cout << "RGB-D" << endl;
 
     //Check settings file
@@ -217,7 +218,7 @@ cv::Mat System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const doub
 
 cv::Mat System::TrackMonocular(const cv::Mat &im, const double &timestamp)
 {
-    if(mSensor!=MONOCULAR)
+    if(mSensor != MONOCULAR)
     {
         cerr << "ERROR: you called TrackMonocular but input sensor was not set to Monocular." << endl;
         exit(-1);

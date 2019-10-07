@@ -122,6 +122,10 @@ public:
     std::vector<MapPoint*> GetTrackedMapPoints();
     std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
 
+    vector<double> vTimesReloc;
+
+    void GetRelocTimes(vector<double> &dst);
+
 private:
 
     // Input sensor

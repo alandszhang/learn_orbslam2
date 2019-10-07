@@ -19,15 +19,18 @@
 */
 
 
-#include<iostream>
-#include<algorithm>
-#include<fstream>
-#include<chrono>
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+#include <chrono>
 
-#include<opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp>
 
-#include<System.h>
-#include<unistd.h> 
+#include <System.h>
+
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -54,8 +57,11 @@ int main(int argc, char **argv)
     ORB_SLAM2::System SLAM(argv[1], argv[2], ORB_SLAM2::System::MONOCULAR, true);
 
     // Vector for tracking time statistics
-    vector<float> vTimesTrack;
+    vector<double> vTimesTrack;
     vTimesTrack.resize(nImages);
+
+    vector<double> vTimesReloc;
+
 
     cout << endl << "-------" << endl;
     cout << "Start processing sequence ..." << endl;
@@ -91,9 +97,9 @@ int main(int argc, char **argv)
         std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
 
-        double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+        double ttrack = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
 
-        vTimesTrack[ni]=ttrack;
+        vTimesTrack[ni] = ttrack;
 
         // Wait to load the next frame
         double T = 0;
@@ -109,15 +115,31 @@ int main(int argc, char **argv)
     // Stop all threads
     SLAM.Shutdown();
 
-    // Tracking time statistics
-    sort(vTimesTrack.begin(), vTimesTrack.end());
-    float totaltime = 0;
-    for(int ni=0; ni<nImages; ni++)
+    SLAM.GetRelocTimes(vTimesReloc);
+    sort(vTimesReloc.begin(), vTimesReloc.end());
+    double totaltime = 0;
+    for (int ni = 0; ni < vTimesReloc.size(); ni++)
     {
-        totaltime+=vTimesTrack[ni];
+        totaltime += vTimesReloc[ni];
+        cout << "vTimesReloc[" << ni << "] = " << vTimesReloc[ni] << endl;
     }
     cout << "-------" << endl << endl;
-    cout << "median tracking time: " << vTimesTrack[nImages/2] << endl;
+    cout << "max relocalization time: " << vTimesReloc[vTimesReloc.size()-1] << endl;
+    cout << "median relocalization time: " << vTimesReloc[vTimesReloc.size()/2] << endl;
+    cout << "min relocalization time: " << vTimesReloc[0] << endl;
+    cout << "mean relocalization time: " << totaltime / vTimesReloc.size() << endl;
+
+    // Tracking time statistics
+    sort(vTimesTrack.begin(), vTimesTrack.end());
+    totaltime = 0;
+    for(int ni = 0; ni < nImages; ni++)
+    {
+        totaltime += vTimesTrack[ni];
+    }
+    cout << "-------" << endl << endl;
+    cout << "max tracking time: " << vTimesTrack[nImages-1] << endl;
+    cout << "median tracking time: " << vTimesTrack[nImages / 2] << endl;
+    cout << "min tracking time; " << vTimesTrack[0] << endl;
     cout << "mean tracking time: " << totaltime/nImages << endl;
 
     // Save camera trajectory
@@ -140,7 +162,7 @@ void LoadImages(const string &strFile, vector<string> &vstrImageFilenames, vecto
     while(!f.eof())
     {
         string s;
-        getline(f,s);
+        getline(f, s);
         if(!s.empty())
         {
             stringstream ss;

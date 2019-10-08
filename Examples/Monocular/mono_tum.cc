@@ -116,31 +116,35 @@ int main(int argc, char **argv)
     SLAM.Shutdown();
 
     SLAM.GetRelocTimes(vTimesReloc);
-    sort(vTimesReloc.begin(), vTimesReloc.end());
-    double totaltime = 0;
-    for (int ni = 0; ni < vTimesReloc.size(); ni++)
+    if(int vSizeTimesReloc = vTimesReloc.size())
     {
-        totaltime += vTimesReloc[ni];
-        cout << "vTimesReloc[" << ni << "] = " << vTimesReloc[ni] << endl;
+        sort(vTimesReloc.begin(), vTimesReloc.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vSizeTimesReloc; ni++)
+        {
+            totaltime += vTimesReloc[ni];
+            // cout << "vTimesReloc[" << ni << "] = " << vTimesReloc[ni] << endl;
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max relocalization time: " << vTimesReloc[vSizeTimesReloc-1] << endl;
+        cout << "median relocalization time: " << vTimesReloc[vSizeTimesReloc/2] << endl;
+        cout << "min relocalization time: " << vTimesReloc[0] << endl;
+        cout << "mean relocalization time: " << totaltime / vSizeTimesReloc << endl;        
     }
-    cout << "-------" << endl << endl;
-    cout << "max relocalization time: " << vTimesReloc[vTimesReloc.size()-1] << endl;
-    cout << "median relocalization time: " << vTimesReloc[vTimesReloc.size()/2] << endl;
-    cout << "min relocalization time: " << vTimesReloc[0] << endl;
-    cout << "mean relocalization time: " << totaltime / vTimesReloc.size() << endl;
 
-    // Tracking time statistics
-    sort(vTimesTrack.begin(), vTimesTrack.end());
-    totaltime = 0;
-    for(int ni = 0; ni < nImages; ni++)
-    {
-        totaltime += vTimesTrack[ni];
+    {   // Tracking time statistics
+        sort(vTimesTrack.begin(), vTimesTrack.end());
+        double totaltime = 0;
+        for(int ni = 0; ni < nImages; ni++)
+        {
+            totaltime += vTimesTrack[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max tracking time: " << vTimesTrack[nImages-1] << endl;
+        cout << "median tracking time: " << vTimesTrack[nImages / 2] << endl;
+        cout << "min tracking time; " << vTimesTrack[0] << endl;
+        cout << "mean tracking time: " << totaltime/nImages << endl;
     }
-    cout << "-------" << endl << endl;
-    cout << "max tracking time: " << vTimesTrack[nImages-1] << endl;
-    cout << "median tracking time: " << vTimesTrack[nImages / 2] << endl;
-    cout << "min tracking time; " << vTimesTrack[0] << endl;
-    cout << "mean tracking time: " << totaltime/nImages << endl;
 
     // Save camera trajectory
     SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");

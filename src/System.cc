@@ -308,7 +308,9 @@ void System::Reset()
 
 void System::Shutdown()
 {
+    // cout << "test before..." << endl;
     vTimesReloc = mpTracker->vTimesReloc;
+    // cout << "test after..." << endl;
 
     mpLocalMapper->RequestFinish();
     mpLoopCloser->RequestFinish();
@@ -388,7 +390,6 @@ void System::SaveTrajectoryTUM(const string &filename)
     f.close();
     cout << endl << "trajectory saved!" << endl;
 }
-
 
 void System::SaveKeyFrameTrajectoryTUM(const string &filename)
 {

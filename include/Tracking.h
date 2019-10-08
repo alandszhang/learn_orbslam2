@@ -115,7 +115,8 @@ public:
 
     void Reset();
 
-    vector<double> vTimesReloc;
+    vector<double> vTimesRelocalization;
+    vector<double> vTimesTrackLocalMap;
 
 protected:
 

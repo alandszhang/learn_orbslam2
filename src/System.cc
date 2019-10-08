@@ -116,9 +116,14 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
 }
 
-void System::GetRelocTimes(vector<double> &dst)
+void System::GetRelocalizationTimes(vector<double> &dst)
 {
-    dst = vTimesReloc;
+    dst = vTimesRelocalization;
+}
+
+void System::GetTrackLocalMapTimes(vector<double> &dst)
+{
+    dst = vTimesTrackLocalMap;
 }
 
 cv::Mat System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp)
@@ -308,9 +313,8 @@ void System::Reset()
 
 void System::Shutdown()
 {
-    // cout << "test before..." << endl;
-    vTimesReloc = mpTracker->vTimesReloc;
-    // cout << "test after..." << endl;
+    vTimesRelocalization = mpTracker->vTimesRelocalization;
+    vTimesTrackLocalMap = mpTracker->vTimesTrackLocalMap;
 
     mpLocalMapper->RequestFinish();
     mpLoopCloser->RequestFinish();

@@ -60,7 +60,8 @@ int main(int argc, char **argv)
     vector<double> vTimesTrack;
     vTimesTrack.resize(nImages);
 
-    vector<double> vTimesReloc;
+    vector<double> vTimesRelocalization;
+    vector<double> vTimesTrackLocalMap;
 
 
     cout << endl << "-------" << endl;
@@ -115,21 +116,37 @@ int main(int argc, char **argv)
     // Stop all threads
     SLAM.Shutdown();
 
-    SLAM.GetRelocTimes(vTimesReloc);
-    if(int vSizeTimesReloc = vTimesReloc.size())
+    SLAM.GetTrackLocalMapTimes(vTimesTrackLocalMap);
+    if(int vTimeSize = vTimesTrackLocalMap.size())
     {
-        sort(vTimesReloc.begin(), vTimesReloc.end());
+        sort(vTimesTrackLocalMap.begin(), vTimesTrackLocalMap.end());
         double totaltime = 0;
-        for (int ni = 0; ni < vSizeTimesReloc; ni++)
+        for (int ni = 0; ni < vTimeSize; ni++)
         {
-            totaltime += vTimesReloc[ni];
-            // cout << "vTimesReloc[" << ni << "] = " << vTimesReloc[ni] << endl;
+            totaltime += vTimesTrackLocalMap[ni];
         }
         cout << endl << "-------" << endl << endl;
-        cout << "max relocalization time: " << vTimesReloc[vSizeTimesReloc-1] << endl;
-        cout << "median relocalization time: " << vTimesReloc[vSizeTimesReloc/2] << endl;
-        cout << "min relocalization time: " << vTimesReloc[0] << endl;
-        cout << "mean relocalization time: " << totaltime / vSizeTimesReloc << endl;        
+        cout << "max tracking local map time: " << vTimesTrackLocalMap[vTimeSize-1] << endl;
+        cout << "median tracking local map time: " << vTimesTrackLocalMap[vTimeSize/2] << endl;
+        cout << "min tracking local map time: " << vTimesTrackLocalMap[0] << endl;
+        cout << "mean tracking local map time: " << totaltime / vTimeSize << endl;        
+    }
+
+    SLAM.GetRelocalizationTimes(vTimesRelocalization);
+    if(int vTimeSize = vTimesRelocalization.size())
+    {
+        sort(vTimesRelocalization.begin(), vTimesRelocalization.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesRelocalization[ni];
+            // cout << "vTimesRelocalization[" << ni << "] = " << vTimesRelocalization[ni] << endl;
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max relocalization time: " << vTimesRelocalization[vTimeSize-1] << endl;
+        cout << "median relocalization time: " << vTimesRelocalization[vTimeSize/2] << endl;
+        cout << "min relocalization time: " << vTimesRelocalization[0] << endl;
+        cout << "mean relocalization time: " << totaltime / vTimeSize << endl;        
     }
 
     {   // Tracking time statistics

@@ -323,7 +323,7 @@ void Tracking::Track()
 #else
                 std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 #endif
-                cout << "Relocalization..." << endl;
+
                 bOK = Relocalization();
 
 #ifdef COMPILEDWITHC11
@@ -331,9 +331,8 @@ void Tracking::Track()
 #else
                 std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
-
                 double treloc = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                vTimesReloc.push_back(treloc);
+                vTimesRelocalization.push_back(treloc);
             }
         }
         else
@@ -414,7 +413,23 @@ void Tracking::Track()
         if(!mbOnlyTracking)
         {
             if(bOK)
+            {
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif
+
                 bOK = TrackLocalMap();
+
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                double ttracklocalmap = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                vTimesTrackLocalMap.push_back(ttracklocalmap);
+            }
         }
         else
         {
@@ -422,7 +437,24 @@ void Tracking::Track()
             // a local map and therefore we do not perform TrackLocalMap(). Once the system relocalizes
             // the camera we will use the local map again.
             if(bOK && !mbVO)
+            {
+                cout << endl << "Track Local Map..." << endl;
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif
+
                 bOK = TrackLocalMap();
+
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                double ttracklocalmap = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                vTimesTrackLocalMap.push_back(ttracklocalmap);
+            }
         }
 
         if(bOK)

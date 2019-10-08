@@ -41,7 +41,8 @@ Initializer::Initializer(const Frame &ReferenceFrame, float sigma, int iteration
     mMaxIterations = iterations;
 }
 
-bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatches12, cv::Mat &R21, cv::Mat &t21,
+bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatches12, 
+                             cv::Mat &R21, cv::Mat &t21,
                              vector<cv::Point3f> &vP3D, vector<bool> &vbTriangulated)
 {
     // Fill structures with current keypoints and matches with reference frame
@@ -51,15 +52,15 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
     mvMatches12.clear();
     mvMatches12.reserve(mvKeys2.size());
     mvbMatched1.resize(mvKeys1.size());
-    for(size_t i=0, iend=vMatches12.size();i<iend; i++)
+    for(size_t i=0,iend=vMatches12.size(); i<iend; i++)
     {
         if(vMatches12[i]>=0)
         {
-            mvMatches12.push_back(make_pair(i,vMatches12[i]));
-            mvbMatched1[i]=true;
+            mvMatches12.push_back(make_pair(i, vMatches12[i]));
+            mvbMatched1[i] = true;
         }
         else
-            mvbMatched1[i]=false;
+            mvbMatched1[i] = false;
     }
 
     const int N = mvMatches12.size();
@@ -75,7 +76,7 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
     }
 
     // Generate sets of 8 points for each RANSAC iteration
-    mvSets = vector< vector<size_t> >(mMaxIterations,vector<size_t>(8,0));
+    mvSets = vector<vector<size_t>>(mMaxIterations, vector<size_t>(8,0));
 
     DUtils::Random::SeedRandOnce(0);
 
@@ -86,7 +87,7 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
         // Select a minimum set
         for(size_t j=0; j<8; j++)
         {
-            int randi = DUtils::Random::RandomInt(0,vAvailableIndices.size()-1);
+            int randi = DUtils::Random::RandomInt(0, vAvailableIndices.size()-1);
             int idx = vAvailableIndices[randi];
 
             mvSets[it][j] = idx;
@@ -101,8 +102,8 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
     float SH, SF;
     cv::Mat H, F;
 
-    thread threadH(&Initializer::FindHomography,this,ref(vbMatchesInliersH), ref(SH), ref(H));
-    thread threadF(&Initializer::FindFundamental,this,ref(vbMatchesInliersF), ref(SF), ref(F));
+    thread threadH(&Initializer::FindHomography, this, ref(vbMatchesInliersH), ref(SH), ref(H));
+    thread threadF(&Initializer::FindFundamental, this, ref(vbMatchesInliersF), ref(SF), ref(F));
 
     // Wait until both threads have finished
     threadH.join();
@@ -113,9 +114,9 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
 
     // Try to reconstruct from homography or fundamental depending on the ratio (0.40-0.45)
     if(RH>0.40)
-        return ReconstructH(vbMatchesInliersH,H,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
+        return ReconstructH(vbMatchesInliersH, H, mK, R21, t21, vP3D, vbTriangulated, 1.0, 50);
     else //if(pF_HF>0.6)
-        return ReconstructF(vbMatchesInliersF,F,mK,R21,t21,vP3D,vbTriangulated,1.0,50);
+        return ReconstructF(vbMatchesInliersF, F, mK, R21, t21, vP3D, vbTriangulated, 1.0, 50);
 
     return false;
 }
@@ -129,19 +130,19 @@ void Initializer::FindHomography(vector<bool> &vbMatchesInliers, float &score, c
     // Normalize coordinates
     vector<cv::Point2f> vPn1, vPn2;
     cv::Mat T1, T2;
-    Normalize(mvKeys1,vPn1, T1);
-    Normalize(mvKeys2,vPn2, T2);
+    Normalize(mvKeys1, vPn1, T1);
+    Normalize(mvKeys2, vPn2, T2);
     cv::Mat T2inv = T2.inv();
 
     // Best Results variables
     score = 0.0;
-    vbMatchesInliers = vector<bool>(N,false);
+    vbMatchesInliers = vector<bool>(N, false);
 
     // Iteration variables
     vector<cv::Point2f> vPn1i(8);
     vector<cv::Point2f> vPn2i(8);
     cv::Mat H21i, H12i;
-    vector<bool> vbCurrentInliers(N,false);
+    vector<bool> vbCurrentInliers(N, false);
     float currentScore;
 
     // Perform all RANSAC iterations and save the solution with highest score
@@ -156,7 +157,7 @@ void Initializer::FindHomography(vector<bool> &vbMatchesInliers, float &score, c
             vPn2i[j] = vPn2[mvMatches12[idx].second];
         }
 
-        cv::Mat Hn = ComputeH21(vPn1i,vPn2i);
+        cv::Mat Hn = ComputeH21(vPn1i, vPn2i);
         H21i = T2inv*Hn*T1;
         H12i = H21i.inv();
 
@@ -180,19 +181,19 @@ void Initializer::FindFundamental(vector<bool> &vbMatchesInliers, float &score, 
     // Normalize coordinates
     vector<cv::Point2f> vPn1, vPn2;
     cv::Mat T1, T2;
-    Normalize(mvKeys1,vPn1, T1);
-    Normalize(mvKeys2,vPn2, T2);
+    Normalize(mvKeys1, vPn1, T1);
+    Normalize(mvKeys2, vPn2, T2);
     cv::Mat T2t = T2.t();
 
     // Best Results variables
     score = 0.0;
-    vbMatchesInliers = vector<bool>(N,false);
+    vbMatchesInliers = vector<bool>(N, false);
 
     // Iteration variables
     vector<cv::Point2f> vPn1i(8);
     vector<cv::Point2f> vPn2i(8);
     cv::Mat F21i;
-    vector<bool> vbCurrentInliers(N,false);
+    vector<bool> vbCurrentInliers(N, false);
     float currentScore;
 
     // Perform all RANSAC iterations and save the solution with highest score

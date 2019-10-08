@@ -256,9 +256,9 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
     }
 
     if(mState==NOT_INITIALIZED || mState==NO_IMAGES_YET)
-        mCurrentFrame = Frame(mImGray,timestamp,mpIniORBextractor,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
+        mCurrentFrame = Frame(mImGray, timestamp, mpIniORBextractor, mpORBVocabulary, mK, mDistCoef, mbf, mThDepth);
     else
-        mCurrentFrame = Frame(mImGray,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
+        mCurrentFrame = Frame(mImGray, timestamp, mpORBextractorLeft, mpORBVocabulary, mK, mDistCoef, mbf, mThDepth);
 
     Track();
 
@@ -267,7 +267,7 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
 
 void Tracking::Track()
 {
-    if(mState==NO_IMAGES_YET)
+    if(mState == NO_IMAGES_YET)
     {
         mState = NOT_INITIALIZED;
     }
@@ -277,16 +277,16 @@ void Tracking::Track()
     // Get Map Mutex -> Map cannot be changed
     unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
 
-    if(mState==NOT_INITIALIZED)
+    if(mState == NOT_INITIALIZED)
     {
-        if(mSensor==System::STEREO || mSensor==System::RGBD)
+        if(mSensor == System::STEREO || mSensor == System::RGBD)
             StereoInitialization();
         else
             MonocularInitialization();
 
         mpFrameDrawer->Update(this);
 
-        if(mState!=OK)
+        if(mState != OK)
             return;
     }
     else
@@ -300,7 +300,7 @@ void Tracking::Track()
             // Local Mapping is activated. This is the normal behaviour, unless
             // you explicitly activate the "only tracking" mode.
 
-            if(mState==OK)
+            if(mState == OK)
             {
                 // Local Mapping might have changed some MapPoints tracked in last frame
                 CheckReplacedInLastFrame();
@@ -325,7 +325,7 @@ void Tracking::Track()
         {
             // Localization Mode: Local Mapping is deactivated
 
-            if(mState==LOST)
+            if(mState == LOST)
             {
                 bOK = Relocalization();
             }
@@ -470,7 +470,7 @@ void Tracking::Track()
         }
 
         // Reset if the camera get lost soon after initialization
-        if(mState==LOST)
+        if(mState == LOST)
         {
             if(mpMap->KeyFramesInMap()<=5)
             {

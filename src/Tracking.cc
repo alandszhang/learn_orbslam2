@@ -438,7 +438,6 @@ void Tracking::Track()
             // the camera we will use the local map again.
             if(bOK && !mbVO)
             {
-                cout << endl << "Track Local Map..." << endl;
 #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else

@@ -60,6 +60,11 @@ void LocalMapping::Run()
         // Check if there are keyframes in the queue
         if(CheckNewKeyFrames())
         {
+#ifdef COMPILEDWITHC11
+            std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+            std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif
             // BoW conversion and insertion in Map
             ProcessNewKeyFrame();
 
@@ -88,6 +93,14 @@ void LocalMapping::Run()
             }
 
             mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
+
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                double tlocalmapping = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                vTimesLocalMapping.push_back(tlocalmapping);
         }
         else if(Stop())
         {
@@ -111,6 +124,21 @@ void LocalMapping::Run()
         usleep(3000);
     }
 
+    if(int vTimeSize = vTimesLocalMapping.size())
+    {
+        sort(vTimesLocalMapping.begin(), vTimesLocalMapping.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesLocalMapping[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max local mapping time: " << vTimesLocalMapping[vTimeSize-1] << endl;
+        cout << "median local mapping time: " << vTimesLocalMapping[vTimeSize/2] << endl;
+        cout << "min local mapping time: " << vTimesLocalMapping[0] << endl;
+        cout << "mean local mapping time: " << totaltime / vTimeSize << endl;        
+    }
+
     SetFinish();
 }
 
@@ -120,7 +148,6 @@ void LocalMapping::InsertKeyFrame(KeyFrame *pKF)
     mlNewKeyFrames.push_back(pKF);
     mbAbortBA=true;
 }
-
 
 bool LocalMapping::CheckNewKeyFrames()
 {

@@ -66,16 +66,61 @@ void LoopClosing::Run()
         // Check if there are keyframes in the queue
         if(CheckNewKeyFrames())
         {
+            
+#ifdef COMPILEDWITHC11
+            std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+            std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif
             // Detect loop candidates and check covisibility consistency
-            if(DetectLoop())
+            bool ifDetectedLoop = DetectLoop();
+
+#ifdef COMPILEDWITHC11
+            std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+            std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+            double tloopdetection = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+            vTimesLoopDetection.push_back(tloopdetection);
+
+            if(ifDetectedLoop)
             {
-               // Compute similarity transformation [sR|t]
-               // In the stereo/RGBD case s=1
-               if(ComputeSim3())
-               {
-                   // Perform loop fusion and pose graph optimization
-                   CorrectLoop();
-               }
+
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif
+                // Compute similarity transformation [sR|t]
+                // In the stereo/RGBD case s=1
+                bool isMatched = ComputeSim3();
+
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                double tcomputesim3 = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                vTimesComputeSim3.push_back(tcomputesim3);
+
+                if(isMatched)
+                {    
+#ifdef COMPILEDWITHC11
+                    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                    std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif
+                    // Perform loop fusion and pose graph optimization
+                    CorrectLoop();
+
+#ifdef COMPILEDWITHC11
+                    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                    std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                    double tloopcorrection = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                    vTimesLoopCorrection.push_back(tloopcorrection);
+                }
             }
         }       
 
@@ -85,6 +130,51 @@ void LoopClosing::Run()
             break;
 
         usleep(5000);
+    }
+
+    if(int vTimeSize = vTimesLoopDetection.size())
+    {
+        sort(vTimesLoopDetection.begin(), vTimesLoopDetection.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesLoopDetection[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max loop detection time: " << vTimesLoopDetection[vTimeSize-1] << endl;
+        cout << "median loop detection time: " << vTimesLoopDetection[vTimeSize/2] << endl;
+        cout << "min loop detection time: " << vTimesLoopDetection[0] << endl;
+        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
+    }
+
+    if(int vTimeSize = vTimesComputeSim3.size())
+    {
+        sort(vTimesComputeSim3.begin(), vTimesComputeSim3.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesComputeSim3[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max compute sim3 time: " << vTimesComputeSim3[vTimeSize-1] << endl;
+        cout << "median compute sim3 time: " << vTimesComputeSim3[vTimeSize/2] << endl;
+        cout << "min compute sim3 time: " << vTimesComputeSim3[0] << endl;
+        cout << "mean compute sim3 time: " << totaltime / vTimeSize << endl;        
+    }
+
+    if(int vTimeSize = vTimesLoopCorrection.size())
+    {
+        sort(vTimesLoopCorrection.begin(), vTimesLoopCorrection.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesLoopCorrection[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max loop correction time: " << vTimesLoopCorrection[vTimeSize-1] << endl;
+        cout << "median loop correction time: " << vTimesLoopCorrection[vTimeSize/2] << endl;
+        cout << "min loop correction time: " << vTimesLoopCorrection[0] << endl;
+        cout << "mean loop correction time: " << totaltime / vTimeSize << endl;        
     }
 
     SetFinish();
@@ -114,7 +204,7 @@ bool LoopClosing::DetectLoop()
     }
 
     //If the map contains less than 10 KF or less than 10 KF have passed from last loop detection
-    if(mpCurrentKF->mnId<mLastLoopKFid+10)
+    if(mpCurrentKF->mnId < mLastLoopKFid+10)
     {
         mpKeyFrameDB->add(mpCurrentKF);
         mpCurrentKF->SetErase();
@@ -192,12 +282,12 @@ bool LoopClosing::DetectLoop()
                 {
                     ConsistentGroup cg = make_pair(spCandidateGroup,nCurrentConsistency);
                     vCurrentConsistentGroups.push_back(cg);
-                    vbConsistentGroup[iG]=true; //this avoid to include the same group more than once
+                    vbConsistentGroup[iG] = true; //this avoid to include the same group more than once
                 }
                 if(nCurrentConsistency>=mnCovisibilityConsistencyTh && !bEnoughConsistent)
                 {
                     mvpEnoughConsistentCandidates.push_back(pCandidateKF);
-                    bEnoughConsistent=true; //this avoid to insert the same candidate more than once
+                    bEnoughConsistent = true; //this avoid to insert the same candidate more than once
                 }
             }
         }
@@ -614,7 +704,6 @@ void LoopClosing::SearchAndFuse(const KeyFrameAndPose &CorrectedPosesMap)
         }
     }
 }
-
 
 void LoopClosing::RequestReset()
 {

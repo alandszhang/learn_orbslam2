@@ -72,6 +72,9 @@ public:
         return mlNewKeyFrames.size();
     }
 
+public:
+    vector<double> vTimesLocalMapping;
+
 protected:
 
     bool CheckNewKeyFrames();

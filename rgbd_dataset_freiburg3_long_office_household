@@ -1,0 +1,42 @@
+-------
+
+max loop detection time: 0.0225879
+median loop detection time: 0.00410809
+min loop detection time: 0.000201715
+mean loop detection time: 0.00480487
+
+-------
+
+max compute sim3 time: 0.0333371
+median compute sim3 time: 0.000674053
+min compute sim3 time: 0.00039316
+mean compute sim3 time: 0.00104337
+
+-------
+
+max loop correction time: 1.16232
+median loop correction time: 1.16232
+min loop correction time: 1.16232
+mean loop correction time: 1.16232
+
+-------
+
+max local mapping time: 2.01478
+median local mapping time: 0.527216
+min local mapping time: 0.0211282
+mean local mapping time: 0.55654
+
+-------
+
+max tracking local map time: 0.079769
+median tracking local map time: 0.0166107
+min tracking local map time: 0.00492384
+mean tracking local map time: 0.0193905
+
+-------
+
+max tracking time: 0.310962
+median tracking time: 0.0487034
+min tracking time; 0.0284812
+mean tracking time: 0.0541563
+

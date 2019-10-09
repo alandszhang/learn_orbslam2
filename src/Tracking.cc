@@ -579,7 +579,7 @@ void Tracking::StereoInitialization()
                 pNewMP->UpdateNormalAndDepth();
                 mpMap->AddMapPoint(pNewMP);
 
-                mCurrentFrame.mvpMapPoints[i]=pNewMP;
+                mCurrentFrame.mvpMapPoints[i] = pNewMP;
             }
         }
 
@@ -611,13 +611,15 @@ void Tracking::MonocularInitialization()
 
     if(!mpInitializer)
     {
+        cout << "mpInitializer = " << mpInitializer << endl;
         // Set Reference Frame
-        if(mCurrentFrame.mvKeys.size()>100)
+        if(mCurrentFrame.mvKeys.size() > 100)
         {
+            cout << "mCurrentFrame.mvKeys.size = " << mCurrentFrame.mvKeys.size() << endl;
             mInitialFrame = Frame(mCurrentFrame);
             mLastFrame = Frame(mCurrentFrame);
             mvbPrevMatched.resize(mCurrentFrame.mvKeysUn.size());
-            for(size_t i=0; i<mCurrentFrame.mvKeysUn.size(); i++)
+            for(size_t i = 0; i < mCurrentFrame.mvKeysUn.size(); i++)
                 mvbPrevMatched[i] = mCurrentFrame.mvKeysUn[i].pt;
 
             if(mpInitializer)
@@ -632,8 +634,9 @@ void Tracking::MonocularInitialization()
     }
     else
     {
+        cout << "mCurrentFrame.mvKeys.size = " << mCurrentFrame.mvKeys.size() << endl;  
         // Try to initialize
-        if((int)mCurrentFrame.mvKeys.size()<=100)
+        if((int)mCurrentFrame.mvKeys.size() <= 100)
         {
             delete mpInitializer;
             mpInitializer = static_cast<Initializer*>(NULL);
@@ -644,9 +647,10 @@ void Tracking::MonocularInitialization()
         // Find correspondences
         ORBmatcher matcher(0.9, true);
         int nmatches = matcher.SearchForInitialization(mInitialFrame, mCurrentFrame, mvbPrevMatched, mvIniMatches, 100);
+        cout << "nmatches = " << nmatches << endl;
 
         // Check if there are enough correspondences
-        if(nmatches<100)
+        if(nmatches < 100)
         {
             delete mpInitializer;
             mpInitializer = static_cast<Initializer*>(NULL);
@@ -659,9 +663,9 @@ void Tracking::MonocularInitialization()
 
         if(mpInitializer->Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated))
         {
-            for(size_t i=0,iend=mvIniMatches.size(); i<iend; i++)
+            for(size_t i = 0, iend = mvIniMatches.size(); i < iend; i++)
             {
-                if(mvIniMatches[i]>=0 && !vbTriangulated[i])
+                if(mvIniMatches[i] >= 0 && !vbTriangulated[i])
                 {
                     mvIniMatches[i] = -1;
                     nmatches--;
@@ -727,7 +731,7 @@ void Tracking::CreateInitialMapMonocular()
     pKFcur->UpdateConnections();
 
     // Bundle Adjustment
-    cout << "New Map created with " << mpMap->MapPointsInMap() << " points" << endl;
+    cout << endl << "New Map created with " << mpMap->MapPointsInMap() << " points" << endl;
 
     Optimizer::GlobalBundleAdjustemnt(mpMap, 20);
 

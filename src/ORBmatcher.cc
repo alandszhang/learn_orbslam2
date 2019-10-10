@@ -139,7 +139,6 @@ float ORBmatcher::RadiusByViewingCos(const float &viewCos)
         return 4.0;
 }
 
-
 bool ORBmatcher::CheckDistEpipolarLine(const cv::KeyPoint &kp1,const cv::KeyPoint &kp2,const cv::Mat &F12,const KeyFrame* pKF2)
 {
     // Epipolar line in second image l = x1'F12 = [a b c]
@@ -407,25 +406,27 @@ int ORBmatcher::SearchByProjection(KeyFrame* pKF, cv::Mat Scw, const vector<MapP
 
 int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f> &vbPrevMatched, vector<int> &vnMatches12, int windowSize)
 {
-    int nmatches=0;
-    vnMatches12 = vector<int>(F1.mvKeysUn.size(),-1);
+    int nmatches = 0;
+    vnMatches12 = vector<int>(F1.mvKeysUn.size(), -1);
+    // for(int cnt = 0; cnt < vnMatches12.size(); cnt++)
+    //     cout << "vnMatches12 = " << vnMatches12[cnt] << endl;
 
     vector<int> rotHist[HISTO_LENGTH];
-    for(int i=0;i<HISTO_LENGTH;i++)
+    for(int i = 0; i < HISTO_LENGTH; i++)
         rotHist[i].reserve(500);
-    const float factor = 1.0f/HISTO_LENGTH;
+    const float factor = 1.0f / HISTO_LENGTH;
 
-    vector<int> vMatchedDistance(F2.mvKeysUn.size(),INT_MAX);
-    vector<int> vnMatches21(F2.mvKeysUn.size(),-1);
+    vector<int> vMatchedDistance(F2.mvKeysUn.size(), INT_MAX);
+    vector<int> vnMatches21(F2.mvKeysUn.size(), -1);
 
-    for(size_t i1=0, iend1=F1.mvKeysUn.size(); i1<iend1; i1++)
+    for(size_t i1 = 0, iend1 = F1.mvKeysUn.size(); i1 < iend1; i1++)
     {
         cv::KeyPoint kp1 = F1.mvKeysUn[i1];
         int level1 = kp1.octave;
-        if(level1>0)
+        if(level1 > 0)
             continue;
 
-        vector<size_t> vIndices2 = F2.GetFeaturesInArea(vbPrevMatched[i1].x,vbPrevMatched[i1].y, windowSize,level1,level1);
+        vector<size_t> vIndices2 = F2.GetFeaturesInArea(vbPrevMatched[i1].x, vbPrevMatched[i1].y, windowSize, level1, level1);
 
         if(vIndices2.empty())
             continue;
@@ -436,52 +437,52 @@ int ORBmatcher::SearchForInitialization(Frame &F1, Frame &F2, vector<cv::Point2f
         int bestDist2 = INT_MAX;
         int bestIdx2 = -1;
 
-        for(vector<size_t>::iterator vit=vIndices2.begin(); vit!=vIndices2.end(); vit++)
+        for(vector<size_t>::iterator vit=vIndices2.begin(); vit != vIndices2.end(); vit++)
         {
             size_t i2 = *vit;
 
             cv::Mat d2 = F2.mDescriptors.row(i2);
 
-            int dist = DescriptorDistance(d1,d2);
+            int dist = DescriptorDistance(d1, d2);
 
             if(vMatchedDistance[i2]<=dist)
                 continue;
 
-            if(dist<bestDist)
+            if(dist < bestDist)
             {
-                bestDist2=bestDist;
-                bestDist=dist;
-                bestIdx2=i2;
+                bestDist2 = bestDist;
+                bestDist = dist;
+                bestIdx2 = i2;
             }
-            else if(dist<bestDist2)
+            else if(dist < bestDist2)
             {
-                bestDist2=dist;
+                bestDist2 = dist;
             }
         }
 
-        if(bestDist<=TH_LOW)
+        if(bestDist <= TH_LOW)
         {
-            if(bestDist<(float)bestDist2*mfNNratio)
+            if(bestDist<(float)bestDist2 * mfNNratio)
             {
-                if(vnMatches21[bestIdx2]>=0)
+                if(vnMatches21[bestIdx2] >= 0)
                 {
-                    vnMatches12[vnMatches21[bestIdx2]]=-1;
+                    vnMatches12[vnMatches21[bestIdx2]] = -1;
                     nmatches--;
                 }
-                vnMatches12[i1]=bestIdx2;
-                vnMatches21[bestIdx2]=i1;
-                vMatchedDistance[bestIdx2]=bestDist;
+                vnMatches12[i1] = bestIdx2;
+                vnMatches21[bestIdx2] = i1;
+                vMatchedDistance[bestIdx2] = bestDist;
                 nmatches++;
 
                 if(mbCheckOrientation)
                 {
                     float rot = F1.mvKeysUn[i1].angle-F2.mvKeysUn[bestIdx2].angle;
-                    if(rot<0.0)
-                        rot+=360.0f;
-                    int bin = round(rot*factor);
-                    if(bin==HISTO_LENGTH)
-                        bin=0;
-                    assert(bin>=0 && bin<HISTO_LENGTH);
+                    if(rot < 0.0)
+                        rot += 360.0f;
+                    int bin = round(rot * factor);
+                    if(bin == HISTO_LENGTH)
+                        bin = 0;
+                    assert(bin >= 0 && bin < HISTO_LENGTH);
                     rotHist[bin].push_back(i1);
                 }
             }

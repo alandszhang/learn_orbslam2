@@ -255,7 +255,9 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
             cvtColor(mImGray, mImGray, CV_BGRA2GRAY);
     }
 
+
     if(mState == NOT_INITIALIZED || mState == NO_IMAGES_YET)
+
         mCurrentFrame = Frame(mImGray, timestamp, mpIniORBextractor, mpORBVocabulary, mK, mDistCoef, mbf, mThDepth);
     else
         mCurrentFrame = Frame(mImGray, timestamp, mpORBextractorLeft, mpORBVocabulary, mK, mDistCoef, mbf, mThDepth);
@@ -305,12 +307,14 @@ void Tracking::Track()
                 // Local Mapping might have changed some MapPoints tracked in last frame
                 CheckReplacedInLastFrame();
 
-                if(mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId+2)
+                if(mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId + 2)
                 {
+                    cout << "TrackReferenceKeyFrame" << endl;
                     bOK = TrackReferenceKeyFrame();
                 }
                 else
                 {
+                    cout << "TrackWithMotionModel" << endl;
                     bOK = TrackWithMotionModel();
                     if(!bOK)
                         bOK = TrackReferenceKeyFrame();
@@ -614,7 +618,6 @@ void Tracking::MonocularInitialization()
         // Set Reference Frame
         if(mCurrentFrame.mvKeys.size() > 100)
         {
-            cout << "mCurrentFrame.mvKeys.size = " << mCurrentFrame.mvKeys.size() << endl;
             mInitialFrame = Frame(mCurrentFrame);
             mLastFrame = Frame(mCurrentFrame);
             mvbPrevMatched.resize(mCurrentFrame.mvKeysUn.size());
@@ -633,7 +636,6 @@ void Tracking::MonocularInitialization()
     }
     else
     {
-        cout << "mCurrentFrame.mvKeys.size = " << mCurrentFrame.mvKeys.size() << endl;  
         // Try to initialize
         if((int)mCurrentFrame.mvKeys.size() <= 100)
         {
@@ -646,7 +648,10 @@ void Tracking::MonocularInitialization()
         // Find correspondences
         ORBmatcher matcher(0.9, true);
         int nmatches = matcher.SearchForInitialization(mInitialFrame, mCurrentFrame, mvbPrevMatched, mvIniMatches, 100);
-        cout << "nmatches = " << nmatches << endl;
+        // cout << "nmatches = " << nmatches << endl;
+        // for(int cnt = 0; cnt < mvIniMatches.size(); cnt++)
+        //     if(mvIniMatches[cnt] >= 0)
+        //         cout << "mvIniMatches[" << cnt << "] = " << mvIniMatches[cnt] << endl;
 
         // Check if there are enough correspondences
         if(nmatches < 100)
@@ -674,8 +679,8 @@ void Tracking::MonocularInitialization()
             // Set Frame Poses
             mInitialFrame.SetPose(cv::Mat::eye(4, 4, CV_32F));
             cv::Mat Tcw = cv::Mat::eye(4, 4, CV_32F);
-            Rcw.copyTo(Tcw.rowRange(0, 3).colRange(0, 3));
-            tcw.copyTo(Tcw.rowRange(0, 3).col(3));
+            Rcw.copyTo(Tcw.rowRange(0,3).colRange(0,3));
+            tcw.copyTo(Tcw.rowRange(0,3).col(3));
             mCurrentFrame.SetPose(Tcw);
 
             CreateInitialMapMonocular();
@@ -698,9 +703,9 @@ void Tracking::CreateInitialMapMonocular()
     mpMap->AddKeyFrame(pKFcur);
 
     // Create MapPoints and asscoiate to keyframes
-    for(size_t i=0; i<mvIniMatches.size(); i++)
+    for(size_t i = 0; i < mvIniMatches.size(); i++)
     {
-        if(mvIniMatches[i]<0)
+        if(mvIniMatches[i] < 0)
             continue;
 
         //Create MapPoint.
@@ -738,7 +743,7 @@ void Tracking::CreateInitialMapMonocular()
     float medianDepth = pKFini->ComputeSceneMedianDepth(2);
     float invMedianDepth = 1.0f / medianDepth;
 
-    if(medianDepth<0 || pKFcur->TrackedMapPoints(1)<100)
+    if(medianDepth < 0 || pKFcur->TrackedMapPoints(1) < 100)
     {
         cout << "Wrong initialization, reseting..." << endl;
         Reset();

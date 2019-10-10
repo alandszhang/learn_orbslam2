@@ -28,9 +28,11 @@
 
 #include "ORBmatcher.h"
 
-#include<mutex>
-#include<thread>
-#include<unistd.h> 
+#include <mutex>
+#include <thread>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 
 namespace ORB_SLAM2
@@ -57,7 +59,7 @@ void LoopClosing::SetLocalMapper(LocalMapping *pLocalMapper)
 
 void LoopClosing::Run()
 {
-    mbFinished =false;
+    mbFinished = false;
 
     while(1)
     {

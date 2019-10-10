@@ -79,11 +79,11 @@ public:
 
     // Tracking states
     enum eTrackingState{
-        SYSTEM_NOT_READY=-1,
-        NO_IMAGES_YET=0,
-        NOT_INITIALIZED=1,
-        OK=2,
-        LOST=3
+        SYSTEM_NOT_READY = -1,
+        NO_IMAGES_YET = 0,
+        NOT_INITIALIZED = 1, // Trying to Initialization
+        OK = 2, // SLAM Mode
+        LOST = 3 // Lost
     };
 
     eTrackingState mState;
@@ -114,6 +114,9 @@ public:
     bool mbOnlyTracking;
 
     void Reset();
+
+    vector<double> vTimesRelocalization;
+    vector<double> vTimesTrackLocalMap;
 
 protected:
 

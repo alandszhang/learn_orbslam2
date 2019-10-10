@@ -121,6 +121,13 @@ public:
     int GetTrackingState();
     std::vector<MapPoint*> GetTrackedMapPoints();
     std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
+    
+    // Vectors for time statistics
+    vector<double> vTimesRelocalization;
+    vector<double> vTimesTrackLocalMap;
+
+    void GetRelocalizationTimes(vector<double> &dst);
+    void GetTrackLocalMapTimes(vector<double> &dst);
 
 private:
 

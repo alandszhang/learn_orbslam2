@@ -25,7 +25,9 @@
 #include <thread>
 #include <pangolin/pangolin.h>
 #include <iomanip>
-#include <unistd.h> 
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 namespace ORB_SLAM2
 {
@@ -42,11 +44,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     cout << "Input sensor was set to: ";
 
-    if(mSensor == MONOCULAR)
+    if(mSensor==MONOCULAR)
         cout << "Monocular" << endl;
-    else if(mSensor == STEREO)
+    else if(mSensor==STEREO)
         cout << "Stereo" << endl;
-    else if(mSensor == RGBD)
+    else if(mSensor==RGBD)
         cout << "RGB-D" << endl;
 
     //Check settings file
@@ -88,7 +90,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     //Initialize the Local Mapping thread and launch
     mpLocalMapper = new LocalMapping(mpMap, mSensor==MONOCULAR);
-    mptLocalMapping = new thread(&ORB_SLAM2::LocalMapping::Run,mpLocalMapper);
+    mptLocalMapping = new thread(&ORB_SLAM2::LocalMapping::Run, mpLocalMapper);
 
     //Initialize the Loop Closing thread and launch
     mpLoopCloser = new LoopClosing(mpMap, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR);
@@ -97,7 +99,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     //Initialize the Viewer thread and launch
     if(bUseViewer)
     {
-        mpViewer = new Viewer(this, mpFrameDrawer,mpMapDrawer,mpTracker,strSettingsFile);
+        mpViewer = new Viewer(this, mpFrameDrawer, mpMapDrawer, mpTracker, strSettingsFile);
         mptViewer = new thread(&Viewer::Run, mpViewer);
         mpTracker->SetViewer(mpViewer);
     }
@@ -111,6 +113,16 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     mpLoopCloser->SetTracker(mpTracker);
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
+}
+
+void System::GetRelocalizationTimes(vector<double> &dst)
+{
+    dst = vTimesRelocalization;
+}
+
+void System::GetTrackLocalMapTimes(vector<double> &dst)
+{
+    dst = vTimesTrackLocalMap;
 }
 
 cv::Mat System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp)
@@ -257,7 +269,7 @@ cv::Mat System::TrackMonocular(const cv::Mat &im, const double &timestamp)
         }
     }
 
-    cv::Mat Tcw = mpTracker->GrabImageMonocular(im,timestamp);
+    cv::Mat Tcw = mpTracker->GrabImageMonocular(im, timestamp);
 
     unique_lock<mutex> lock2(mMutexState);
     mTrackingState = mpTracker->mState;
@@ -300,6 +312,9 @@ void System::Reset()
 
 void System::Shutdown()
 {
+    vTimesRelocalization = mpTracker->vTimesRelocalization;
+    vTimesTrackLocalMap = mpTracker->vTimesTrackLocalMap;
+
     mpLocalMapper->RequestFinish();
     mpLoopCloser->RequestFinish();
     if(mpViewer)
@@ -378,7 +393,6 @@ void System::SaveTrajectoryTUM(const string &filename)
     f.close();
     cout << endl << "trajectory saved!" << endl;
 }
-
 
 void System::SaveKeyFrameTrajectoryTUM(const string &filename)
 {

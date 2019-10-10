@@ -19,16 +19,19 @@
 */
 
 
-#include<iostream>
-#include<algorithm>
-#include<fstream>
-#include<chrono>
-#include<iomanip>
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+#include <chrono>
+#include <iomanip>
 
-#include<opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp>
 
-#include"System.h"
-#include<unistd.h> 
+#include "System.h"
+
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -51,7 +54,8 @@ int main(int argc, char **argv)
     int nImages = vstrImageFilenames.size();
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR,true);
+
+    ORB_SLAM2::System SLAM(argv[1], argv[2], ORB_SLAM2::System::MONOCULAR, true);
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;
@@ -66,7 +70,7 @@ int main(int argc, char **argv)
     for(int ni=0; ni<nImages; ni++)
     {
         // Read image from file
-        im = cv::imread(vstrImageFilenames[ni],CV_LOAD_IMAGE_UNCHANGED);
+        im = cv::imread(vstrImageFilenames[ni], CV_LOAD_IMAGE_UNCHANGED);
         double tframe = vTimestamps[ni];
 
         if(im.empty())

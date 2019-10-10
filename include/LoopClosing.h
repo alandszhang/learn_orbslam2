@@ -82,6 +82,12 @@ public:
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
+public:
+    vector<double> vTimesLoopClosing;
+    vector<double> vTimesLoopDetection;
+    vector<double> vTimesComputeSim3;
+    vector<double> vTimesLoopCorrection;
+
 protected:
 
     bool CheckNewKeyFrames();

@@ -41,7 +41,7 @@ Initializer::Initializer(const Frame &ReferenceFrame, float sigma, int iteration
     mvKeys1 = ReferenceFrame.mvKeysUn;
 
     mSigma = sigma;
-    mSigma2 = sigma*sigma;
+    mSigma2 = sigma * sigma;
     mMaxIterations = iterations;
 }
 
@@ -175,7 +175,6 @@ void Initializer::FindHomography(vector<bool> &vbMatchesInliers, float &score, c
     }
 }
 
-
 void Initializer::FindFundamental(vector<bool> &vbMatchesInliers, float &score, cv::Mat &F21)
 {
     // Number of putative matches
@@ -225,7 +224,6 @@ void Initializer::FindFundamental(vector<bool> &vbMatchesInliers, float &score, 
         }
     }
 }
-
 
 cv::Mat Initializer::ComputeH21(const vector<cv::Point2f> &vP1, const vector<cv::Point2f> &vP2)
 {

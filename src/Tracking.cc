@@ -608,7 +608,6 @@ void Tracking::StereoInitialization()
 
 void Tracking::MonocularInitialization()
 {
-
     if(!mpInitializer)
     {
         cout << "mpInitializer = " << mpInitializer << endl;

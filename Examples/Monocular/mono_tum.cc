@@ -63,7 +63,6 @@ int main(int argc, char **argv)
     vector<double> vTimesRelocalization;
     vector<double> vTimesTrackLocalMap;
 
-
     cout << endl << "-------" << endl;
     cout << "Start processing sequence ..." << endl;
     cout << "Images in the sequence: " << nImages << endl << endl;

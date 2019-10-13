@@ -206,7 +206,7 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
     return mCurrentFrame.mTcw.clone();
 }
 
-cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp)
+cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB, const cv::Mat &imD, const double &timestamp)
 {
     mImGray = imRGB;
     cv::Mat imDepth = imD;
@@ -342,7 +342,6 @@ void Tracking::Track()
         else
         {
             // Localization Mode: Local Mapping is deactivated
-
             if(mState == LOST)
             {
                 bOK = Relocalization();

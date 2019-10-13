@@ -120,14 +120,10 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
     // Try to reconstruct from homography or fundamental depending on the ratio (0.40-0.45)
 
     if(RH > 0.40)
-    {
         return ReconstructH(vbMatchesInliersH, H, mK, R21, t21, vP3D, vbTriangulated, 1.0, 50);
-    }
     else //if(pF_HF>0.6)
-    {
         return ReconstructF(vbMatchesInliersF, F, mK, R21, t21, vP3D, vbTriangulated, 1.0, 50);
-    }
-
+    
     return false;
 }
 
@@ -574,6 +570,7 @@ bool Initializer::ReconstructF(vector<bool> &vbMatchesInliers, cv::Mat &F21, cv:
         }
     }
 
+    cout << "ReconstructF final false" << endl;
     return false;
 }
 
@@ -605,7 +602,6 @@ bool Initializer::ReconstructH(vector<bool> &vbMatchesInliers, cv::Mat &H21, cv:
 
     if(d1 / d2 < 1.00001 || d2 / d3 < 1.00001)
     {
-        cout << "former false" << endl;
         return false;
     }
 
@@ -736,7 +732,7 @@ bool Initializer::ReconstructH(vector<bool> &vbMatchesInliers, cv::Mat &H21, cv:
         return true;
     }
 
-    cout << "final false" << endl;
+    cout << "ReconstructH final false" << endl;
     return false;
 }
 

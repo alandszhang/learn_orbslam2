@@ -100,7 +100,7 @@ void LoopClosing::Run()
 #else
                 std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
-                double tcomputesim3 = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                double tcomputesim3 = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count();
                 vTimesComputeSim3.push_back(tcomputesim3);
 
                 if(isMatched)
@@ -118,7 +118,7 @@ void LoopClosing::Run()
 #else
                     std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
-                    double tloopcorrection = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                    double tloopcorrection = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count();
                     vTimesLoopCorrection.push_back(tloopcorrection);
                 }
             }
@@ -204,7 +204,7 @@ bool LoopClosing::DetectLoop()
     }
 
     //If the map contains less than 10 KF or less than 10 KF have passed from last loop detection
-    if(mpCurrentKF->mnId < mLastLoopKFid+10)
+    if(mpCurrentKF->mnId < mLastLoopKFid + 10)
     {
         mpKeyFrameDB->add(mpCurrentKF);
         mpCurrentKF->SetErase();
@@ -217,7 +217,7 @@ bool LoopClosing::DetectLoop()
     const vector<KeyFrame*> vpConnectedKeyFrames = mpCurrentKF->GetVectorCovisibleKeyFrames();
     const DBoW2::BowVector &CurrentBowVec = mpCurrentKF->mBowVec;
     float minScore = 1;
-    for(size_t i=0; i<vpConnectedKeyFrames.size(); i++)
+    for(size_t i = 0; i < vpConnectedKeyFrames.size(); i++)
     {
         KeyFrame* pKF = vpConnectedKeyFrames[i];
         if(pKF->isBad())
@@ -226,7 +226,7 @@ bool LoopClosing::DetectLoop()
 
         float score = mpORBVocabulary->score(CurrentBowVec, BowVec);
 
-        if(score<minScore)
+        if(score < minScore)
             minScore = score;
     }
 

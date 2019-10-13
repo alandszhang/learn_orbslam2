@@ -301,25 +301,11 @@ void Tracking::Track()
         {
             // Local Mapping is activated. This is the normal behaviour, unless
             // you explicitly activate the "only tracking" mode.
-
             if(mState == OK)
             {
-#ifdef COMPILEDWITHC11
-                std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-#else
-                std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
 
                 // Local Mapping might have changed some MapPoints tracked in last frame
                 CheckReplacedInLastFrame();
-
-#ifdef COMPILEDWITHC11
-                std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-#else
-                std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
-#endif
-                double tCheckReplacedInLastFrame = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                vTimesCheckReplacedInLastFrame.push_back(tCheckReplacedInLastFrame);
 
                 if(mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId + 2)
                 {
@@ -329,7 +315,6 @@ void Tracking::Track()
 #else
                     std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 #endif                    
-                    // cout << "TrackReferenceKeyFrame" << endl;
                     bOK = TrackReferenceKeyFrame();
 
 #ifdef COMPILEDWITHC11
@@ -339,16 +324,15 @@ void Tracking::Track()
 #endif
                     double tTrackReferenceKeyFrame = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
                     vTimesTrackReferenceKeyFrame.push_back(tTrackReferenceKeyFrame);
-
                 }
                 else
                 {
+
 #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                     std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 #endif         
-                    // cout << "TrackWithMotionModel" << endl;
                     bOK = TrackWithMotionModel();
                     
 #ifdef COMPILEDWITHC11
@@ -673,7 +657,11 @@ void Tracking::MonocularInitialization()
     if(!mpInitializer)
     {
         // Set Reference Frame
-        if(mCurrentFrame.mvKeys.size() > 100)
+        if(mCurrentFrame.mvKeys.size() <= 100)
+        {
+            cout << "firstFrame.keyPoints.size <= 100, mpInitializer failed..." << endl;
+        }
+        else
         {
             mInitialFrame = Frame(mCurrentFrame);
             mLastFrame = Frame(mCurrentFrame);
@@ -696,23 +684,35 @@ void Tracking::MonocularInitialization()
         // Try to initialize
         if((int)mCurrentFrame.mvKeys.size() <= 100)
         {
+            cout << "secondFrame.keyPoints.size <= 100, mpInitializer deleted..." << endl;
+
             delete mpInitializer;
             mpInitializer = static_cast<Initializer*>(NULL);
             fill(mvIniMatches.begin(), mvIniMatches.end(), -1);
             return;
         }
 
+#ifdef COMPILEDWITHC11
+        std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+        std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif 
         // Find correspondences
         ORBmatcher matcher(0.9, true);
         int nmatches = matcher.SearchForInitialization(mInitialFrame, mCurrentFrame, mvbPrevMatched, mvIniMatches, 100);
-        // cout << "nmatches = " << nmatches << endl;
-        // for(int cnt = 0; cnt < mvIniMatches.size(); cnt++)
-        //     if(mvIniMatches[cnt] >= 0)
-        //         cout << "mvIniMatches[" << cnt << "] = " << mvIniMatches[cnt] << endl;
+
+#ifdef COMPILEDWITHC11
+        std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+        std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+        double tSearchForInitialization = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+        vTimesSearchForInitialization.push_back(tSearchForInitialization);
 
         // Check if there are enough correspondences
         if(nmatches < 100)
         {
+            cout << "correspondences.size < 100, mpInitializer deleted..." << endl;
             delete mpInitializer;
             mpInitializer = static_cast<Initializer*>(NULL);
             return;
@@ -722,8 +722,29 @@ void Tracking::MonocularInitialization()
         cv::Mat tcw; // Current Camera Translation
         vector<bool> vbTriangulated; // Triangulated Correspondences (mvIniMatches)
 
-        if(mpInitializer->Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated))
+#ifdef COMPILEDWITHC11
+        t1 = std::chrono::steady_clock::now();
+#else
+        t1 = std::chrono::monotonic_clock::now();
+#endif 
+        bool isInitialzed = mpInitializer->Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated);
+
+#ifdef COMPILEDWITHC11
+        t2 = std::chrono::steady_clock::now();
+#else
+        t2 = std::chrono::monotonic_clock::now();
+#endif
+        double tInitialize = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+        vTimesInitialize.push_back(tInitialize);
+
+        if(isInitialzed)
         {
+
+#ifdef COMPILEDWITHC11
+            std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+            std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif 
             for(size_t i = 0, iend = mvIniMatches.size(); i < iend; i++)
             {
                 if(mvIniMatches[i] >= 0 && !vbTriangulated[i])
@@ -741,6 +762,62 @@ void Tracking::MonocularInitialization()
             mCurrentFrame.SetPose(Tcw);
 
             CreateInitialMapMonocular();
+
+#ifdef COMPILEDWITHC11
+            std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+            std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+            double tCreateInitialMapMonocular = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+            vTimesCreateInitialMapMonocular.push_back(tCreateInitialMapMonocular);
+
+/*            if(mState == OK)
+            {
+                if(int vTimeSize = vTimesSearchForInitialization.size())
+                {
+                    sort(vTimesSearchForInitialization.begin(), vTimesSearchForInitialization.end());
+                    double totaltime = 0;
+                    for (int ni = 0; ni < vTimeSize; ni++)
+                    {
+                        totaltime += vTimesSearchForInitialization[ni];
+                    }
+                    cout << endl << "-------" << endl << endl;
+                    cout << "max SearchForInitialization time: " << vTimesSearchForInitialization[vTimeSize-1] << endl;
+                    cout << "median SearchForInitialization time: " << vTimesSearchForInitialization[vTimeSize/2] << endl;
+                    cout << "mean SearchForInitialization time: " << totaltime / vTimeSize << endl;        
+                    cout << "min SearchForInitialization time: " << vTimesSearchForInitialization[0] << endl;
+                }
+
+                if(int vTimeSize = vTimesInitialize.size())
+                {
+                    sort(vTimesInitialize.begin(), vTimesInitialize.end());
+                    double totaltime = 0;
+                    for (int ni = 0; ni < vTimeSize; ni++)
+                    {
+                        totaltime += vTimesInitialize[ni];
+                    }
+                    cout << endl << "-------" << endl << endl;
+                    cout << "max initialize time: " << vTimesInitialize[vTimeSize-1] << endl;
+                    cout << "median initialize time: " << vTimesInitialize[vTimeSize/2] << endl;
+                    cout << "mean initialize time: " << totaltime / vTimeSize << endl;        
+                    cout << "min initialize time: " << vTimesInitialize[0] << endl;
+                }
+
+                if(int vTimeSize = vTimesCreateInitialMapMonocular.size())
+                {
+                    sort(vTimesCreateInitialMapMonocular.begin(), vTimesCreateInitialMapMonocular.end());
+                    double totaltime = 0;
+                    for (int ni = 0; ni < vTimeSize; ni++)
+                    {
+                        totaltime += vTimesCreateInitialMapMonocular[ni];
+                    }
+                    cout << endl << "-------" << endl << endl;
+                    cout << "max CreateInitialMapMonocular time: " << vTimesCreateInitialMapMonocular[vTimeSize-1] << endl;
+                    cout << "median CreateInitialMapMonocular time: " << vTimesCreateInitialMapMonocular[vTimeSize/2] << endl;
+                    cout << "mean CreateInitialMapMonocular time: " << totaltime / vTimeSize << endl;        
+                    cout << "min CreateInitialMapMonocular time: " << vTimesCreateInitialMapMonocular[0] << endl;
+                }
+            }*/
         }
     }
 }
@@ -845,6 +922,7 @@ void Tracking::CreateInitialMapMonocular()
     mpMap->mvpKeyFrameOrigins.push_back(pKFini);
 
     mState = OK;
+
 }
 
 void Tracking::CheckReplacedInLastFrame()

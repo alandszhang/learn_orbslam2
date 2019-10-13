@@ -304,7 +304,6 @@ void System::Shutdown()
 {
     vTimesRelocalization = mpTracker->vTimesRelocalization;
     vTimesTrackLocalMap = mpTracker->vTimesTrackLocalMap;
-    vTimesCheckReplacedInLastFrame = mpTracker->vTimesCheckReplacedInLastFrame;
     vTimesTrackReferenceKeyFrame = mpTracker->vTimesTrackReferenceKeyFrame;
     vTimesTrackWithMotionModel = mpTracker->vTimesTrackWithMotionModel;
 
@@ -317,10 +316,10 @@ void System::Shutdown()
             totaltime += vTimesRelocalization[ni];
         }
         cout << endl << "-------" << endl << endl;
-        cout << "max loop detection time: " << vTimesRelocalization[vTimeSize-1] << endl;
-        cout << "median loop detection time: " << vTimesRelocalization[vTimeSize/2] << endl;
-        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
-        cout << "min loop detection time: " << vTimesRelocalization[0] << endl;
+        cout << "max relocalization time: " << vTimesRelocalization[vTimeSize-1] << endl;
+        cout << "median relocalization time: " << vTimesRelocalization[vTimeSize/2] << endl;
+        cout << "mean relocalization time: " << totaltime / vTimeSize << endl;        
+        cout << "min relocalization time: " << vTimesRelocalization[0] << endl;
     }
 
     if(int vTimeSize = vTimesTrackLocalMap.size())
@@ -332,26 +331,11 @@ void System::Shutdown()
             totaltime += vTimesTrackLocalMap[ni];
         }
         cout << endl << "-------" << endl << endl;
-        cout << "max loop detection time: " << vTimesTrackLocalMap[vTimeSize-1] << endl;
-        cout << "median loop detection time: " << vTimesTrackLocalMap[vTimeSize/2] << endl;
-        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
-        cout << "min loop detection time: " << vTimesTrackLocalMap[0] << endl;
-    }    
-
-    if(int vTimeSize = vTimesCheckReplacedInLastFrame.size())
-    {
-        sort(vTimesCheckReplacedInLastFrame.begin(), vTimesCheckReplacedInLastFrame.end());
-        double totaltime = 0;
-        for (int ni = 0; ni < vTimeSize; ni++)
-        {
-            totaltime += vTimesCheckReplacedInLastFrame[ni];
-        }
-        cout << endl << "-------" << endl << endl;
-        cout << "max loop detection time: " << vTimesCheckReplacedInLastFrame[vTimeSize-1] << endl;
-        cout << "median loop detection time: " << vTimesCheckReplacedInLastFrame[vTimeSize/2] << endl;
-        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
-        cout << "min loop detection time: " << vTimesCheckReplacedInLastFrame[0] << endl;
-    }  
+        cout << "max track local map time: " << vTimesTrackLocalMap[vTimeSize-1] << endl;
+        cout << "median track local map time: " << vTimesTrackLocalMap[vTimeSize/2] << endl;
+        cout << "mean track local map time: " << totaltime / vTimeSize << endl;        
+        cout << "min track local map time: " << vTimesTrackLocalMap[0] << endl;
+    }     
 
     if(int vTimeSize = vTimesTrackReferenceKeyFrame.size())
     {
@@ -362,10 +346,10 @@ void System::Shutdown()
             totaltime += vTimesTrackReferenceKeyFrame[ni];
         }
         cout << endl << "-------" << endl << endl;
-        cout << "max loop detection time: " << vTimesTrackReferenceKeyFrame[vTimeSize-1] << endl;
-        cout << "median loop detection time: " << vTimesTrackReferenceKeyFrame[vTimeSize/2] << endl;
-        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
-        cout << "min loop detection time: " << vTimesTrackReferenceKeyFrame[0] << endl;
+        cout << "max track reference key frame time: " << vTimesTrackReferenceKeyFrame[vTimeSize-1] << endl;
+        cout << "median track reference key frame time: " << vTimesTrackReferenceKeyFrame[vTimeSize/2] << endl;
+        cout << "mean track reference key frame time: " << totaltime / vTimeSize << endl;        
+        cout << "min track reference key frame time: " << vTimesTrackReferenceKeyFrame[0] << endl;
     } 
 
     if(int vTimeSize = vTimesTrackWithMotionModel.size())
@@ -377,10 +361,10 @@ void System::Shutdown()
             totaltime += vTimesTrackWithMotionModel[ni];
         }
         cout << endl << "-------" << endl << endl;
-        cout << "max loop detection time: " << vTimesTrackWithMotionModel[vTimeSize-1] << endl;
-        cout << "median loop detection time: " << vTimesTrackWithMotionModel[vTimeSize/2] << endl;
-        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
-        cout << "min loop detection time: " << vTimesTrackWithMotionModel[0] << endl;
+        cout << "max track with motion model time: " << vTimesTrackWithMotionModel[vTimeSize-1] << endl;
+        cout << "median track with motion model time: " << vTimesTrackWithMotionModel[vTimeSize/2] << endl;
+        cout << "mean track with motion model time: " << totaltime / vTimeSize << endl;        
+        cout << "min track with motion model time: " << vTimesTrackWithMotionModel[0] << endl;
     } 
             
     mpLocalMapper->RequestFinish();

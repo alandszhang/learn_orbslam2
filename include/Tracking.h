@@ -117,9 +117,11 @@ public:
 
     vector<double> vTimesRelocalization;
     vector<double> vTimesTrackLocalMap;
-    vector<double> vTimesCheckReplacedInLastFrame;
     vector<double> vTimesTrackReferenceKeyFrame;
     vector<double> vTimesTrackWithMotionModel;
+    vector<double> vTimesSearchForInitialization;
+    vector<double> vTimesInitialize;
+    vector<double> vTimesCreateInitialMapMonocular;
 
 protected:
 

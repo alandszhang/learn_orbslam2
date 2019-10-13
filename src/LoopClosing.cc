@@ -143,7 +143,7 @@ void LoopClosing::Run()
         usleep(5000);
     }
 
-    if(int vTimeSize = vTimesLoopDetection.size())
+/*    if(int vTimeSize = vTimesLoopDetection.size())
     {
         sort(vTimesLoopDetection.begin(), vTimesLoopDetection.end());
         double totaltime = 0;
@@ -186,7 +186,7 @@ void LoopClosing::Run()
         cout << "median loop correction time: " << vTimesLoopCorrection[vTimeSize/2] << endl;
         cout << "mean loop correction time: " << totaltime / vTimeSize << endl;        
         cout << "min loop correction time: " << vTimesLoopCorrection[0] << endl;
-    }
+    }*/
 
     SetFinish();
 }

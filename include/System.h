@@ -125,7 +125,6 @@ public:
     // Vectors for time statistics
     vector<double> vTimesRelocalization;
     vector<double> vTimesTrackLocalMap;
-    vector<double> vTimesCheckReplacedInLastFrame;
     vector<double> vTimesTrackReferenceKeyFrame;
     vector<double> vTimesTrackWithMotionModel;
 

@@ -195,7 +195,7 @@ void LocalMapping::Run()
         usleep(3000);
     }
 
-    if(int vTimeSize = vTimesProcessNewKeyFrame.size())
+/*    if(int vTimeSize = vTimesProcessNewKeyFrame.size())
     {
         sort(vTimesProcessNewKeyFrame.begin(), vTimesProcessNewKeyFrame.end());
         double totaltime = 0;
@@ -283,7 +283,7 @@ void LocalMapping::Run()
         cout << "median key frame culling time: " << vTimesKeyFrameCulling[vTimeSize/2] << endl;
         cout << "mean key frame culling time: " << totaltime / vTimeSize << endl;        
         cout << "min key frame culling time: " << vTimesKeyFrameCulling[0] << endl;
-    }
+    }*/
 
     SetFinish();
 }

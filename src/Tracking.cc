@@ -309,12 +309,12 @@ void Tracking::Track()
 
                 if(mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId + 2)
                 {
-                    cout << "TrackReferenceKeyFrame" << endl;
+                    // cout << "TrackReferenceKeyFrame" << endl;
                     bOK = TrackReferenceKeyFrame();
                 }
                 else
                 {
-                    cout << "TrackWithMotionModel" << endl;
+                    // cout << "TrackWithMotionModel" << endl;
                     bOK = TrackWithMotionModel();
                     if(!bOK)
                         bOK = TrackReferenceKeyFrame();

@@ -121,12 +121,10 @@ bool Initializer::Initialize(const Frame &CurrentFrame, const vector<int> &vMatc
 
     if(RH > 0.40)
     {
-        cout << "RH > 0.40" << endl;
         return ReconstructH(vbMatchesInliersH, H, mK, R21, t21, vP3D, vbTriangulated, 1.0, 50);
     }
     else //if(pF_HF>0.6)
     {
-        cout << "else" << endl;
         return ReconstructF(vbMatchesInliersF, F, mK, R21, t21, vP3D, vbTriangulated, 1.0, 50);
     }
 

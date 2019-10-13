@@ -54,12 +54,14 @@ void LocalMapping::Run()
 
     while(1)
     {
+
         // Tracking will see that Local Mapping is busy
         SetAcceptKeyFrames(false);
 
         // Check if there are keyframes in the queue
         if(CheckNewKeyFrames())
         {
+            cout << endl << "local mapping begin..." << endl;
 #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
@@ -68,8 +70,10 @@ void LocalMapping::Run()
             // BoW conversion and insertion in Map
             ProcessNewKeyFrame();
 
+            cout << "map point culling begin..." << endl;
             // Check recent MapPoints
             MapPointCulling();
+            cout << "map point culling end..." << endl;
 
             // Triangulate new MapPoints
             CreateNewMapPoints();
@@ -85,11 +89,17 @@ void LocalMapping::Run()
             if(!CheckNewKeyFrames() && !stopRequested())
             {
                 // Local BA
-                if(mpMap->KeyFramesInMap()>2)
-                    Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame,&mbAbortBA, mpMap);
+                if(mpMap->KeyFramesInMap() > 2)
+                {
+                    cout << "local bundle adjustment begin..." << endl;
+                    Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame, &mbAbortBA, mpMap);
+                    cout << "local bundle adjustment end..." << endl;
+                }
 
+                cout << "key frame culling begin..." << endl;
                 // Check redundant local Keyframes
                 KeyFrameCulling();
+                cout << "key frame culling end..." << endl;
             }
 
             mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
@@ -101,6 +111,8 @@ void LocalMapping::Run()
 #endif
                 double tlocalmapping = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
                 vTimesLocalMapping.push_back(tlocalmapping);
+                
+                cout << "local mapping end..." << endl;
         }
         else if(Stop())
         {
@@ -120,6 +132,7 @@ void LocalMapping::Run()
 
         if(CheckFinish())
             break;
+
 
         usleep(3000);
     }

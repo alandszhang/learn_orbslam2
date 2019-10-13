@@ -66,14 +66,17 @@ void LoopClosing::Run()
         // Check if there are keyframes in the queue
         if(CheckNewKeyFrames())
         {
-            
+            cout << endl << "loop closing begin..." << endl;            
 #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
             std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 #endif
+            cout << "loop detection begin..." << endl;
             // Detect loop candidates and check covisibility consistency
             bool ifDetectedLoop = DetectLoop();
+
+            cout << "loop detection end..." << endl;
 
 #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -91,9 +94,12 @@ void LoopClosing::Run()
 #else
                 std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 #endif
+
+                cout << "compute sim3 begin..." << endl;
                 // Compute similarity transformation [sR|t]
                 // In the stereo/RGBD case s=1
                 bool isMatched = ComputeSim3();
+                cout << "compute sim3 end..." << endl;
 
 #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -110,8 +116,10 @@ void LoopClosing::Run()
 #else
                     std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 #endif
+                    cout << "loop correction begin..." << endl << endl;
                     // Perform loop fusion and pose graph optimization
                     CorrectLoop();
+                    cout << "loop correction end..." << endl << endl;
 
 #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -122,12 +130,14 @@ void LoopClosing::Run()
                     vTimesLoopCorrection.push_back(tloopcorrection);
                 }
             }
+            cout << "loop closing end..." << endl;
         }       
 
         ResetIfRequested();
 
         if(CheckFinish())
             break;
+
 
         usleep(5000);
     }

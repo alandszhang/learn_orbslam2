@@ -115,16 +115,6 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpLoopCloser->SetLocalMapper(mpLocalMapper);
 }
 
-void System::GetRelocalizationTimes(vector<double> &dst)
-{
-    dst = vTimesRelocalization;
-}
-
-void System::GetTrackLocalMapTimes(vector<double> &dst)
-{
-    dst = vTimesTrackLocalMap;
-}
-
 cv::Mat System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp)
 {
     if(mSensor!=STEREO)
@@ -314,7 +304,85 @@ void System::Shutdown()
 {
     vTimesRelocalization = mpTracker->vTimesRelocalization;
     vTimesTrackLocalMap = mpTracker->vTimesTrackLocalMap;
+    vTimesCheckReplacedInLastFrame = mpTracker->vTimesCheckReplacedInLastFrame;
+    vTimesTrackReferenceKeyFrame = mpTracker->vTimesTrackReferenceKeyFrame;
+    vTimesTrackWithMotionModel = mpTracker->vTimesTrackWithMotionModel;
 
+    if(int vTimeSize = vTimesRelocalization.size())
+    {
+        sort(vTimesRelocalization.begin(), vTimesRelocalization.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesRelocalization[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max loop detection time: " << vTimesRelocalization[vTimeSize-1] << endl;
+        cout << "median loop detection time: " << vTimesRelocalization[vTimeSize/2] << endl;
+        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
+        cout << "min loop detection time: " << vTimesRelocalization[0] << endl;
+    }
+
+    if(int vTimeSize = vTimesTrackLocalMap.size())
+    {
+        sort(vTimesTrackLocalMap.begin(), vTimesTrackLocalMap.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesTrackLocalMap[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max loop detection time: " << vTimesTrackLocalMap[vTimeSize-1] << endl;
+        cout << "median loop detection time: " << vTimesTrackLocalMap[vTimeSize/2] << endl;
+        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
+        cout << "min loop detection time: " << vTimesTrackLocalMap[0] << endl;
+    }    
+
+    if(int vTimeSize = vTimesCheckReplacedInLastFrame.size())
+    {
+        sort(vTimesCheckReplacedInLastFrame.begin(), vTimesCheckReplacedInLastFrame.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesCheckReplacedInLastFrame[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max loop detection time: " << vTimesCheckReplacedInLastFrame[vTimeSize-1] << endl;
+        cout << "median loop detection time: " << vTimesCheckReplacedInLastFrame[vTimeSize/2] << endl;
+        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
+        cout << "min loop detection time: " << vTimesCheckReplacedInLastFrame[0] << endl;
+    }  
+
+    if(int vTimeSize = vTimesTrackReferenceKeyFrame.size())
+    {
+        sort(vTimesTrackReferenceKeyFrame.begin(), vTimesTrackReferenceKeyFrame.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesTrackReferenceKeyFrame[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max loop detection time: " << vTimesTrackReferenceKeyFrame[vTimeSize-1] << endl;
+        cout << "median loop detection time: " << vTimesTrackReferenceKeyFrame[vTimeSize/2] << endl;
+        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
+        cout << "min loop detection time: " << vTimesTrackReferenceKeyFrame[0] << endl;
+    } 
+
+    if(int vTimeSize = vTimesTrackWithMotionModel.size())
+    {
+        sort(vTimesTrackWithMotionModel.begin(), vTimesTrackWithMotionModel.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesTrackWithMotionModel[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max loop detection time: " << vTimesTrackWithMotionModel[vTimeSize-1] << endl;
+        cout << "median loop detection time: " << vTimesTrackWithMotionModel[vTimeSize/2] << endl;
+        cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
+        cout << "min loop detection time: " << vTimesTrackWithMotionModel[0] << endl;
+    } 
+            
     mpLocalMapper->RequestFinish();
     mpLoopCloser->RequestFinish();
     if(mpViewer)

@@ -154,17 +154,17 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
 
 void Tracking::SetLocalMapper(LocalMapping *pLocalMapper)
 {
-    mpLocalMapper=pLocalMapper;
+    mpLocalMapper = pLocalMapper;
 }
 
 void Tracking::SetLoopClosing(LoopClosing *pLoopClosing)
 {
-    mpLoopClosing=pLoopClosing;
+    mpLoopClosing = pLoopClosing;
 }
 
 void Tracking::SetViewer(Viewer *pViewer)
 {
-    mpViewer=pViewer;
+    mpViewer = pViewer;
 }
 
 cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRectRight, const double &timestamp)
@@ -172,7 +172,7 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
     mImGray = imRectLeft;
     cv::Mat imGrayRight = imRectRight;
 
-    if(mImGray.channels()==3)
+    if(mImGray.channels() == 3)
     {
         if(mbRGB)
         {
@@ -304,20 +304,78 @@ void Tracking::Track()
 
             if(mState == OK)
             {
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif
+
                 // Local Mapping might have changed some MapPoints tracked in last frame
                 CheckReplacedInLastFrame();
 
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                double tCheckReplacedInLastFrame = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                vTimesCheckReplacedInLastFrame.push_back(tCheckReplacedInLastFrame);
+
                 if(mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId + 2)
                 {
+
+#ifdef COMPILEDWITHC11
+                    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                    std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif                    
                     // cout << "TrackReferenceKeyFrame" << endl;
                     bOK = TrackReferenceKeyFrame();
+
+#ifdef COMPILEDWITHC11
+                    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                    std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                    double tTrackReferenceKeyFrame = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                    vTimesTrackReferenceKeyFrame.push_back(tTrackReferenceKeyFrame);
+
                 }
                 else
                 {
+#ifdef COMPILEDWITHC11
+                    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                    std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif         
                     // cout << "TrackWithMotionModel" << endl;
                     bOK = TrackWithMotionModel();
+                    
+#ifdef COMPILEDWITHC11
+                    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                    std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                    double tTrackWithMotionModel = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                    vTimesTrackWithMotionModel.push_back(tTrackWithMotionModel);
+
                     if(!bOK)
+                    {
+#ifdef COMPILEDWITHC11
+                        std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                        std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif    
                         bOK = TrackReferenceKeyFrame();
+
+#ifdef COMPILEDWITHC11
+                        std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                        std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                        double tTrackReferenceKeyFrame = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                        vTimesTrackReferenceKeyFrame.push_back(tTrackReferenceKeyFrame);
+                    }
                 }
             }
             else

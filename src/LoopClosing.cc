@@ -111,6 +111,7 @@ void LoopClosing::Run()
 
                 if(isMatched)
                 {    
+
 #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else

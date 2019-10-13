@@ -73,7 +73,12 @@ public:
     }
 
 public:
-    vector<double> vTimesLocalMapping;
+    vector<double> vTimesProcessNewKeyFrame;
+    vector<double> vTimesMapPointCulling;
+    vector<double> vTimesCreateNewMapPoints;
+    vector<double> vTimesSearchInNeighbors;
+    vector<double> vTimesLocalBundleAdjustment;
+    vector<double> vTimesKeyFrameCulling;
 
 protected:
 

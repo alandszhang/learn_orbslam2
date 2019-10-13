@@ -61,7 +61,7 @@ void LocalMapping::Run()
         // Check if there are keyframes in the queue
         if(CheckNewKeyFrames())
         {
-            cout << endl << "local mapping begin..." << endl;
+
 #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
@@ -70,18 +70,64 @@ void LocalMapping::Run()
             // BoW conversion and insertion in Map
             ProcessNewKeyFrame();
 
-            cout << "map point culling begin..." << endl;
+#ifdef COMPILEDWITHC11
+            std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+            std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+            double tProcessNewKeyFrame = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+            vTimesProcessNewKeyFrame.push_back(tProcessNewKeyFrame);    
+
+#ifdef COMPILEDWITHC11
+            t1 = std::chrono::steady_clock::now();
+#else
+            t1 = std::chrono::monotonic_clock::now();
+#endif
             // Check recent MapPoints
             MapPointCulling();
-            cout << "map point culling end..." << endl;
 
+#ifdef COMPILEDWITHC11
+            t2 = std::chrono::steady_clock::now();
+#else
+            t2 = std::chrono::monotonic_clock::now();
+#endif
+            double tMapPointCulling = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+            vTimesMapPointCulling.push_back(tMapPointCulling);  
+
+#ifdef COMPILEDWITHC11
+            t1 = std::chrono::steady_clock::now();
+#else
+            t1 = std::chrono::monotonic_clock::now();
+#endif            
             // Triangulate new MapPoints
             CreateNewMapPoints();
 
+#ifdef COMPILEDWITHC11
+            t2 = std::chrono::steady_clock::now();
+#else
+            t2 = std::chrono::monotonic_clock::now();
+#endif
+            double tCreateNewMapPoints = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+            vTimesCreateNewMapPoints.push_back(tCreateNewMapPoints);  
+
+
             if(!CheckNewKeyFrames())
             {
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif  
                 // Find more matches in neighbor keyframes and fuse point duplications
                 SearchInNeighbors();
+
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                double tSearchInNeighbors = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                vTimesSearchInNeighbors.push_back(tSearchInNeighbors);  
             }
 
             mbAbortBA = false;
@@ -91,28 +137,40 @@ void LocalMapping::Run()
                 // Local BA
                 if(mpMap->KeyFramesInMap() > 2)
                 {
-                    cout << "local bundle adjustment begin..." << endl;
+#ifdef COMPILEDWITHC11
+                    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                    std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif 
                     Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame, &mbAbortBA, mpMap);
-                    cout << "local bundle adjustment end..." << endl;
-                }
 
-                cout << "key frame culling begin..." << endl;
+#ifdef COMPILEDWITHC11
+                    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+#else
+                    std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
+#endif
+                    double tLocalBundleAdjustment = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                    vTimesLocalBundleAdjustment.push_back(tLocalBundleAdjustment);
+                }
+#ifdef COMPILEDWITHC11
+                std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+#else
+                std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
+#endif 
+
                 // Check redundant local Keyframes
                 KeyFrameCulling();
-                cout << "key frame culling end..." << endl;
-            }
-
-            mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
 
 #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
-                double tlocalmapping = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                vTimesLocalMapping.push_back(tlocalmapping);
-                
-                cout << "local mapping end..." << endl;
+                double tKeyFrameCulling = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+                vTimesKeyFrameCulling.push_back(tKeyFrameCulling);
+            }
+
+            mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
         }
         else if(Stop())
         {
@@ -137,19 +195,94 @@ void LocalMapping::Run()
         usleep(3000);
     }
 
-    if(int vTimeSize = vTimesLocalMapping.size())
+    if(int vTimeSize = vTimesProcessNewKeyFrame.size())
     {
-        sort(vTimesLocalMapping.begin(), vTimesLocalMapping.end());
+        sort(vTimesProcessNewKeyFrame.begin(), vTimesProcessNewKeyFrame.end());
         double totaltime = 0;
         for (int ni = 0; ni < vTimeSize; ni++)
         {
-            totaltime += vTimesLocalMapping[ni];
+            totaltime += vTimesProcessNewKeyFrame[ni];
         }
         cout << endl << "-------" << endl << endl;
-        cout << "max local mapping time: " << vTimesLocalMapping[vTimeSize-1] << endl;
-        cout << "median local mapping time: " << vTimesLocalMapping[vTimeSize/2] << endl;
-        cout << "min local mapping time: " << vTimesLocalMapping[0] << endl;
-        cout << "mean local mapping time: " << totaltime / vTimeSize << endl;        
+        cout << "max process new key frame time: " << vTimesProcessNewKeyFrame[vTimeSize-1] << endl;
+        cout << "median process new key frame time: " << vTimesProcessNewKeyFrame[vTimeSize/2] << endl;
+        cout << "mean process new key frame time: " << totaltime / vTimeSize << endl;        
+        cout << "min process new key frame time: " << vTimesProcessNewKeyFrame[0] << endl;
+    }
+
+    if(int vTimeSize = vTimesMapPointCulling.size())
+    {
+        sort(vTimesMapPointCulling.begin(), vTimesMapPointCulling.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesMapPointCulling[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max map point culling time: " << vTimesMapPointCulling[vTimeSize-1] << endl;
+        cout << "median map point culling time: " << vTimesMapPointCulling[vTimeSize/2] << endl;
+        cout << "mean map point culling time: " << totaltime / vTimeSize << endl;        
+        cout << "min map point culling time: " << vTimesMapPointCulling[0] << endl;
+    }
+
+    if(int vTimeSize = vTimesCreateNewMapPoints.size())
+    {
+        sort(vTimesCreateNewMapPoints.begin(), vTimesCreateNewMapPoints.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesCreateNewMapPoints[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max create new map points time: " << vTimesCreateNewMapPoints[vTimeSize-1] << endl;
+        cout << "median create new map points time: " << vTimesCreateNewMapPoints[vTimeSize/2] << endl;
+        cout << "mean create new map points time: " << totaltime / vTimeSize << endl;        
+        cout << "min create new map points time: " << vTimesCreateNewMapPoints[0] << endl;
+    }
+
+    if(int vTimeSize = vTimesSearchInNeighbors.size())
+    {
+        sort(vTimesSearchInNeighbors.begin(), vTimesSearchInNeighbors.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesSearchInNeighbors[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max search in neighbors time: " << vTimesSearchInNeighbors[vTimeSize-1] << endl;
+        cout << "median search in neighbors time: " << vTimesSearchInNeighbors[vTimeSize/2] << endl;
+        cout << "mean search in neighbors time: " << totaltime / vTimeSize << endl;        
+        cout << "min search in neighbors time: " << vTimesSearchInNeighbors[0] << endl;
+    }
+
+    if(int vTimeSize = vTimesLocalBundleAdjustment.size())
+    {
+        sort(vTimesLocalBundleAdjustment.begin(), vTimesLocalBundleAdjustment.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesLocalBundleAdjustment[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max local bundle adjustment time: " << vTimesLocalBundleAdjustment[vTimeSize-1] << endl;
+        cout << "median local bundle adjustment time: " << vTimesLocalBundleAdjustment[vTimeSize/2] << endl;
+        cout << "mean local bundle adjustment time: " << totaltime / vTimeSize << endl;        
+        cout << "min local bundle adjustment time: " << vTimesLocalBundleAdjustment[0] << endl;
+    }
+
+    if(int vTimeSize = vTimesKeyFrameCulling.size())
+    {
+        sort(vTimesKeyFrameCulling.begin(), vTimesKeyFrameCulling.end());
+        double totaltime = 0;
+        for (int ni = 0; ni < vTimeSize; ni++)
+        {
+            totaltime += vTimesKeyFrameCulling[ni];
+        }
+        cout << endl << "-------" << endl << endl;
+        cout << "max key frame culling time: " << vTimesKeyFrameCulling[vTimeSize-1] << endl;
+        cout << "median key frame culling time: " << vTimesKeyFrameCulling[vTimeSize/2] << endl;
+        cout << "mean key frame culling time: " << totaltime / vTimeSize << endl;        
+        cout << "min key frame culling time: " << vTimesKeyFrameCulling[0] << endl;
     }
 
     SetFinish();

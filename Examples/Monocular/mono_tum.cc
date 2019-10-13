@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     cv::Mat im;
     for(int ni=0; ni<nImages; ni++)
     {
-        cout << "new frame inserted..." << endl;
+        // cout << "new frame inserted..." << endl;
 
         // Read image from file
         im = cv::imread(string(argv[3]) + "/" + vstrImageFilenames[ni], CV_LOAD_IMAGE_UNCHANGED);
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
         if(ttrack < T)
             usleep((T - ttrack) * 1e6);
 
-        cout << "frame tracking done..." << endl;
+        // cout << "frame tracking done..." << endl;
     }
 
     // Stop all threads
@@ -131,8 +131,8 @@ int main(int argc, char **argv)
         cout << endl << "-------" << endl << endl;
         cout << "max tracking local map time: " << vTimesTrackLocalMap[vTimeSize-1] << endl;
         cout << "median tracking local map time: " << vTimesTrackLocalMap[vTimeSize/2] << endl;
-        cout << "min tracking local map time: " << vTimesTrackLocalMap[0] << endl;
         cout << "mean tracking local map time: " << totaltime / vTimeSize << endl;        
+        cout << "min tracking local map time: " << vTimesTrackLocalMap[0] << endl;
     }
 
     SLAM.GetRelocalizationTimes(vTimesRelocalization);
@@ -148,8 +148,8 @@ int main(int argc, char **argv)
         cout << endl << "-------" << endl << endl;
         cout << "max relocalization time: " << vTimesRelocalization[vTimeSize-1] << endl;
         cout << "median relocalization time: " << vTimesRelocalization[vTimeSize/2] << endl;
-        cout << "min relocalization time: " << vTimesRelocalization[0] << endl;
         cout << "mean relocalization time: " << totaltime / vTimeSize << endl;        
+        cout << "min relocalization time: " << vTimesRelocalization[0] << endl;
     }
 
     {   // Tracking time statistics
@@ -162,8 +162,8 @@ int main(int argc, char **argv)
         cout << endl << "-------" << endl << endl;
         cout << "max tracking time: " << vTimesTrack[nImages-1] << endl;
         cout << "median tracking time: " << vTimesTrack[nImages / 2] << endl;
-        cout << "min tracking time; " << vTimesTrack[0] << endl;
         cout << "mean tracking time: " << totaltime/nImages << endl;
+        cout << "min tracking time; " << vTimesTrack[0] << endl;
     }
 
     // Save camera trajectory

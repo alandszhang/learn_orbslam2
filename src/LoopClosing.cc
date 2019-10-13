@@ -66,17 +66,17 @@ void LoopClosing::Run()
         // Check if there are keyframes in the queue
         if(CheckNewKeyFrames())
         {
-            cout << endl << "loop closing begin..." << endl;            
+            // cout << endl << "loop closing begin..." << endl;            
 #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
             std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 #endif
-            cout << "loop detection begin..." << endl;
+            // cout << "loop detection begin..." << endl;
             // Detect loop candidates and check covisibility consistency
             bool ifDetectedLoop = DetectLoop();
 
-            cout << "loop detection end..." << endl;
+            // cout << "loop detection end..." << endl;
 
 #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -95,11 +95,11 @@ void LoopClosing::Run()
                 std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 #endif
 
-                cout << "compute sim3 begin..." << endl;
+                // cout << "compute sim3 begin..." << endl;
                 // Compute similarity transformation [sR|t]
                 // In the stereo/RGBD case s=1
                 bool isMatched = ComputeSim3();
-                cout << "compute sim3 end..." << endl;
+                // cout << "compute sim3 end..." << endl;
 
 #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -116,10 +116,10 @@ void LoopClosing::Run()
 #else
                     std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 #endif
-                    cout << "loop correction begin..." << endl << endl;
+                    // cout << "loop correction begin..." << endl << endl;
                     // Perform loop fusion and pose graph optimization
                     CorrectLoop();
-                    cout << "loop correction end..." << endl << endl;
+                    // cout << "loop correction end..." << endl << endl;
 
 #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -130,7 +130,7 @@ void LoopClosing::Run()
                     vTimesLoopCorrection.push_back(tloopcorrection);
                 }
             }
-            cout << "loop closing end..." << endl;
+            // cout << "loop closing end..." << endl;
         }       
 
         ResetIfRequested();
@@ -153,8 +153,8 @@ void LoopClosing::Run()
         cout << endl << "-------" << endl << endl;
         cout << "max loop detection time: " << vTimesLoopDetection[vTimeSize-1] << endl;
         cout << "median loop detection time: " << vTimesLoopDetection[vTimeSize/2] << endl;
-        cout << "min loop detection time: " << vTimesLoopDetection[0] << endl;
         cout << "mean loop detection time: " << totaltime / vTimeSize << endl;        
+        cout << "min loop detection time: " << vTimesLoopDetection[0] << endl;
     }
 
     if(int vTimeSize = vTimesComputeSim3.size())
@@ -168,8 +168,8 @@ void LoopClosing::Run()
         cout << endl << "-------" << endl << endl;
         cout << "max compute sim3 time: " << vTimesComputeSim3[vTimeSize-1] << endl;
         cout << "median compute sim3 time: " << vTimesComputeSim3[vTimeSize/2] << endl;
-        cout << "min compute sim3 time: " << vTimesComputeSim3[0] << endl;
         cout << "mean compute sim3 time: " << totaltime / vTimeSize << endl;        
+        cout << "min compute sim3 time: " << vTimesComputeSim3[0] << endl;
     }
 
     if(int vTimeSize = vTimesLoopCorrection.size())
@@ -183,8 +183,8 @@ void LoopClosing::Run()
         cout << endl << "-------" << endl << endl;
         cout << "max loop correction time: " << vTimesLoopCorrection[vTimeSize-1] << endl;
         cout << "median loop correction time: " << vTimesLoopCorrection[vTimeSize/2] << endl;
-        cout << "min loop correction time: " << vTimesLoopCorrection[0] << endl;
         cout << "mean loop correction time: " << totaltime / vTimeSize << endl;        
+        cout << "min loop correction time: " << vTimesLoopCorrection[0] << endl;
     }
 
     SetFinish();

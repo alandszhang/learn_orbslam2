@@ -67,33 +67,33 @@ void LoopClosing::Run()
         if(CheckNewKeyFrames())
         {
             // cout << endl << "loop closing begin..." << endl;            
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
             std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
+#endif */
             // cout << "loop detection begin..." << endl;
             // Detect loop candidates and check covisibility consistency
             bool ifDetectedLoop = DetectLoop();
 
             // cout << "loop detection end..." << endl;
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
             std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
             double tloopdetection = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-            vTimesLoopDetection.push_back(tloopdetection);
+            vTimesLoopDetection.push_back(tloopdetection); */
 
             if(ifDetectedLoop)
             {
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
+#endif */
 
                 // cout << "compute sim3 begin..." << endl;
                 // Compute similarity transformation [sR|t]
@@ -101,34 +101,34 @@ void LoopClosing::Run()
                 bool isMatched = ComputeSim3();
                 // cout << "compute sim3 end..." << endl;
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                 double tcomputesim3 = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count();
-                vTimesComputeSim3.push_back(tcomputesim3);
+                vTimesComputeSim3.push_back(tcomputesim3); */
 
                 if(isMatched)
                 {    
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                     std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
+#endif */
                     // cout << "loop correction begin..." << endl << endl;
                     // Perform loop fusion and pose graph optimization
                     CorrectLoop();
                     // cout << "loop correction end..." << endl << endl;
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                     std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                     double tloopcorrection = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count();
-                    vTimesLoopCorrection.push_back(tloopcorrection);
+                    vTimesLoopCorrection.push_back(tloopcorrection); */
                 }
             }
             // cout << "loop closing end..." << endl;
@@ -143,7 +143,7 @@ void LoopClosing::Run()
         usleep(5000);
     }
 
-/*    if(int vTimeSize = vTimesLoopDetection.size())
+/*     if(int vTimeSize = vTimesLoopDetection.size())
     {
         sort(vTimesLoopDetection.begin(), vTimesLoopDetection.end());
         double totaltime = 0;
@@ -186,7 +186,7 @@ void LoopClosing::Run()
         cout << "median loop correction time: " << vTimesLoopCorrection[vTimeSize/2] << endl;
         cout << "mean loop correction time: " << totaltime / vTimeSize << endl;        
         cout << "min loop correction time: " << vTimesLoopCorrection[0] << endl;
-    }*/
+    } */
 
     SetFinish();
 }

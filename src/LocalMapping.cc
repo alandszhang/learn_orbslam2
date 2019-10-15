@@ -62,72 +62,72 @@ void LocalMapping::Run()
         if(CheckNewKeyFrames())
         {
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
             std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
+#endif */
             // BoW conversion and insertion in Map
             ProcessNewKeyFrame();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
             std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
             double tProcessNewKeyFrame = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-            vTimesProcessNewKeyFrame.push_back(tProcessNewKeyFrame);    
+            vTimesProcessNewKeyFrame.push_back(tProcessNewKeyFrame);  */   
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             t1 = std::chrono::steady_clock::now();
 #else
             t1 = std::chrono::monotonic_clock::now();
-#endif
+#endif */
             // Check recent MapPoints
             MapPointCulling();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             t2 = std::chrono::steady_clock::now();
 #else
             t2 = std::chrono::monotonic_clock::now();
 #endif
             double tMapPointCulling = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-            vTimesMapPointCulling.push_back(tMapPointCulling);  
+            vTimesMapPointCulling.push_back(tMapPointCulling) */;  
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             t1 = std::chrono::steady_clock::now();
 #else
             t1 = std::chrono::monotonic_clock::now();
-#endif            
+#endif   */          
             // Triangulate new MapPoints
             CreateNewMapPoints();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             t2 = std::chrono::steady_clock::now();
 #else
             t2 = std::chrono::monotonic_clock::now();
 #endif
             double tCreateNewMapPoints = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-            vTimesCreateNewMapPoints.push_back(tCreateNewMapPoints);  
+            vTimesCreateNewMapPoints.push_back(tCreateNewMapPoints); */  
 
 
             if(!CheckNewKeyFrames())
             {
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif  
+#endif  */ 
                 // Find more matches in neighbor keyframes and fuse point duplications
                 SearchInNeighbors();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                 double tSearchInNeighbors = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                vTimesSearchInNeighbors.push_back(tSearchInNeighbors);  
+                vTimesSearchInNeighbors.push_back(tSearchInNeighbors);   */
             }
 
             mbAbortBA = false;
@@ -137,37 +137,39 @@ void LocalMapping::Run()
                 // Local BA
                 if(mpMap->KeyFramesInMap() > 2)
                 {
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                     std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif 
+#endif  */
+
                     Optimizer::LocalBundleAdjustment(mpCurrentKeyFrame, &mbAbortBA, mpMap);
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                     std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                     double tLocalBundleAdjustment = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                    vTimesLocalBundleAdjustment.push_back(tLocalBundleAdjustment);
+                    vTimesLocalBundleAdjustment.push_back(tLocalBundleAdjustment); */
                 }
-#ifdef COMPILEDWITHC11
+
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif 
+#endif  */
 
                 // Check redundant local Keyframes
                 KeyFrameCulling();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                 double tKeyFrameCulling = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                vTimesKeyFrameCulling.push_back(tKeyFrameCulling);
+                vTimesKeyFrameCulling.push_back(tKeyFrameCulling); */
             }
 
             mpLoopCloser->InsertKeyFrame(mpCurrentKeyFrame);
@@ -195,7 +197,7 @@ void LocalMapping::Run()
         usleep(3000);
     }
 
-/*    if(int vTimeSize = vTimesProcessNewKeyFrame.size())
+/*     if(int vTimeSize = vTimesProcessNewKeyFrame.size())
     {
         sort(vTimesProcessNewKeyFrame.begin(), vTimesProcessNewKeyFrame.end());
         double totaltime = 0;
@@ -283,7 +285,7 @@ void LocalMapping::Run()
         cout << "median key frame culling time: " << vTimesKeyFrameCulling[vTimeSize/2] << endl;
         cout << "mean key frame culling time: " << totaltime / vTimeSize << endl;        
         cout << "min key frame culling time: " << vTimesKeyFrameCulling[0] << endl;
-    }*/
+    } */
 
     SetFinish();
 }

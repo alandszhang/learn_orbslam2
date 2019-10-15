@@ -570,7 +570,7 @@ bool Initializer::ReconstructF(vector<bool> &vbMatchesInliers, cv::Mat &F21, cv:
         }
     }
 
-    cout << "Reconstruct from F fialed" << endl;
+    // cout << "Reconstruct from F fialed" << endl;
     return false;
 }
 
@@ -732,7 +732,7 @@ bool Initializer::ReconstructH(vector<bool> &vbMatchesInliers, cv::Mat &H21, cv:
         return true;
     }
 
-    cout << "Reconstruct from H failed" << endl;
+    // cout << "Reconstruct from H failed" << endl;
     return false;
 }
 

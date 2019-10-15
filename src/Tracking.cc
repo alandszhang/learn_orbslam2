@@ -310,75 +310,81 @@ void Tracking::Track()
                 if(mVelocity.empty() || mCurrentFrame.mnId < mnLastRelocFrameId + 2)
                 {
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                     std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif                    
+#endif   */                  
+
                     bOK = TrackReferenceKeyFrame();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                     std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                     double tTrackReferenceKeyFrame = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                    vTimesTrackReferenceKeyFrame.push_back(tTrackReferenceKeyFrame);
+                    vTimesTrackReferenceKeyFrame.push_back(tTrackReferenceKeyFrame); */
+
                 }
                 else
                 {
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                     std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif         
+#endif    */      
+
                     bOK = TrackWithMotionModel();
                     
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                     std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                     double tTrackWithMotionModel = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                    vTimesTrackWithMotionModel.push_back(tTrackWithMotionModel);
+                    vTimesTrackWithMotionModel.push_back(tTrackWithMotionModel); */
 
                     if(!bOK)
                     {
-#ifdef COMPILEDWITHC11
+
+/* #ifdef COMPILEDWITHC11
                         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                         std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif    
+#endif   */  
+
                         bOK = TrackReferenceKeyFrame();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                         std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                         double tTrackReferenceKeyFrame = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                        vTimesTrackReferenceKeyFrame.push_back(tTrackReferenceKeyFrame);
+                        vTimesTrackReferenceKeyFrame.push_back(tTrackReferenceKeyFrame); */
                     }
                 }
             }
             else
             {
-#ifdef COMPILEDWITHC11
+
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
+#endif */
 
                 bOK = Relocalization();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                 double treloc = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                vTimesRelocalization.push_back(treloc);
+                vTimesRelocalization.push_back(treloc); */
             }
         }
         else
@@ -460,21 +466,22 @@ void Tracking::Track()
         {
             if(bOK)
             {
-#ifdef COMPILEDWITHC11
+
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
+#endif */
 
                 bOK = TrackLocalMap();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                 double ttracklocalmap = std::chrono::duration_cast<std::chrono::duration<double> > (t2 - t1).count();
-                vTimesTrackLocalMap.push_back(ttracklocalmap);
+                vTimesTrackLocalMap.push_back(ttracklocalmap); */
             }
         }
         else
@@ -484,21 +491,21 @@ void Tracking::Track()
             // the camera we will use the local map again.
             if(bOK && !mbVO)
             {
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif
+#endif */
 
                 bOK = TrackLocalMap();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
                 std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
                 std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
                 double ttracklocalmap = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-                vTimesTrackLocalMap.push_back(ttracklocalmap);
+                vTimesTrackLocalMap.push_back(ttracklocalmap); */
             }
         }
 
@@ -554,7 +561,7 @@ void Tracking::Track()
             // pass to the new keyframe, so that bundle adjustment will finally decide
             // if they are outliers or not. We don't want next frame to estimate its position
             // with those points so we discard them in the frame.
-            for(int i=0; i < mCurrentFrame.N; i++)
+            for(int i = 0; i < mCurrentFrame.N; i++)
             {
                 if(mCurrentFrame.mvpMapPoints[i] && mCurrentFrame.mvbOutlier[i])
                     mCurrentFrame.mvpMapPoints[i] = static_cast<MapPoint*>(NULL);
@@ -692,22 +699,22 @@ void Tracking::MonocularInitialization()
             return;
         }
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
         std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif 
+#endif  */
         // Find correspondences
         ORBmatcher matcher(0.9, true);
         int nmatches = matcher.SearchForInitialization(mInitialFrame, mCurrentFrame, mvbPrevMatched, mvIniMatches, 100);
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
         std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
         double tSearchForInitialization = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-        vTimesSearchForInitialization.push_back(tSearchForInitialization);
+        vTimesSearchForInitialization.push_back(tSearchForInitialization); */
 
         // Check if there are enough correspondences
         if(nmatches < 100)
@@ -722,29 +729,29 @@ void Tracking::MonocularInitialization()
         cv::Mat tcw; // Current Camera Translation
         vector<bool> vbTriangulated; // Triangulated Correspondences (mvIniMatches)
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
         t1 = std::chrono::steady_clock::now();
 #else
         t1 = std::chrono::monotonic_clock::now();
-#endif 
+#endif  */
         bool isInitialzed = mpInitializer->Initialize(mCurrentFrame, mvIniMatches, Rcw, tcw, mvIniP3D, vbTriangulated);
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
         t2 = std::chrono::steady_clock::now();
 #else
         t2 = std::chrono::monotonic_clock::now();
 #endif
         double tInitialize = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-        vTimesInitialize.push_back(tInitialize);
+        vTimesInitialize.push_back(tInitialize); */
 
         if(isInitialzed)
         {
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
             std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
-#endif 
+#endif  */
             for(size_t i = 0, iend = mvIniMatches.size(); i < iend; i++)
             {
                 if(mvIniMatches[i] >= 0 && !vbTriangulated[i])
@@ -763,15 +770,15 @@ void Tracking::MonocularInitialization()
 
             CreateInitialMapMonocular();
 
-#ifdef COMPILEDWITHC11
+/* #ifdef COMPILEDWITHC11
             std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 #else
             std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 #endif
             double tCreateInitialMapMonocular = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
-            vTimesCreateInitialMapMonocular.push_back(tCreateInitialMapMonocular);
+            vTimesCreateInitialMapMonocular.push_back(tCreateInitialMapMonocular); */
 
-/*            if(mState == OK)
+/*             if(mState == OK)
             {
                 if(int vTimeSize = vTimesSearchForInitialization.size())
                 {
@@ -817,7 +824,7 @@ void Tracking::MonocularInitialization()
                     cout << "mean CreateInitialMapMonocular time: " << totaltime / vTimeSize << endl;        
                     cout << "min CreateInitialMapMonocular time: " << vTimesCreateInitialMapMonocular[0] << endl;
                 }
-            }*/
+            } */
         }
     }
 }
